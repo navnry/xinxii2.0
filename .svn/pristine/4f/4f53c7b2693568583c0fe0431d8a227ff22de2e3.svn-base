@@ -1,0 +1,867 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+        // #ifdef APP-PLUS
+		{
+            "path": "pages/welcome/index",
+            "style": {
+                "navigationBarTitleText": "欢迎页",
+                "app-plus": {
+                    "titleNView": false,
+                    "bounce": "none"
+                }
+            }
+        },
+        // #endif
+		{
+            "path": "pages/home/index",
+            "style": {
+                "navigationBarTitleText": "首页",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/friends",
+            "style": {
+                "navigationBarTitleText": "朋友圈",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/allbanner",
+            "style": {
+                "navigationBarTitleText": "全部海报",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/sign",
+            "style": {
+                "navigationBarTitleText": "签到",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/signbanner",
+            "style": {
+                "navigationBarTitleText": "日签海报",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/searchreslut",
+            "style": {
+                "navigationBarTitleText": "搜索",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/home/poster",
+            "style": {
+                "navigationBarTitleText": "海报",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/home/start",
+            "style" : {
+        		 "navigationBarTitleText": "今日之星",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+        	}
+        },
+        {
+            "path" : "pages/home/startlist",
+            "style" : {
+            	 "navigationBarTitleText": "往期回顾",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+            }
+        },
+        {
+            "path" : "pages/home/customer",
+            "style" : {
+            	 "navigationBarTitleText": "客户管理",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+            }
+        },
+        {
+            "path" : "pages/home/addcustomer",
+            "style" : {
+            	 "navigationBarTitleText": "添加客户",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+            }
+        },
+        {
+            "path" : "pages/home/customerinfo",
+            "style" : {
+            	 "navigationBarTitleText": "客户信息",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+            }
+        },
+        {
+            "path" : "pages/home/starproduct",
+            "style" : {
+                 "navigationBarTitleText": "明星产品专区",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+            }
+        },
+        
+        {
+            "path": "pages/product/index",
+            "style": {
+                "navigationBarTitleText": "产品库",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/product/list",
+            "style": {
+                "navigationBarTitleText": "产品列表",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/product/detail",
+            "style": {
+                "navigationBarTitleText": "详情",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/product/search",
+            "style": {
+                "navigationBarTitleText": "产品搜索",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/product/safedetail",
+            "style": {
+                "navigationBarTitleText": "保障详情",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/train/index",
+            "style": {
+                "navigationBarTitleText": "知识课堂",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/train/detail",
+            "style": {
+                "navigationBarTitleText": "详情",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/train/list",
+            "style": {
+                "navigationBarTitleText": "近期回顾",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path": "pages/train/search",
+            "style": {
+                "navigationBarTitleText": "知识课堂搜索",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        
+        
+        {
+            "path" : "pages/my/index",
+            "style" : {
+                "navigationBarTitleText": "我的",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/login",
+            "style" : {
+                "navigationBarTitleText": "登录",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        
+        {
+            "path" : "pages/my/webview",
+            "style" : {
+                "navigationBarTitleText": "禧小保",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/userinfo",
+            "style" : {
+                "navigationBarTitleText": "个人信息",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/set",
+            "style" : {
+                "navigationBarTitleText": "设置",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/invite",
+            "style" : {
+                "navigationBarTitleText": "我的邀请",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/plan",
+            "style" : {
+                "navigationBarTitleText": "历史计划书",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/platinfo",
+            "style" : {
+                "navigationBarTitleText": "平台资质",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/wxlogin",
+            "style" : {
+                "navigationBarTitleText": "微信授权",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/editusername",
+            "style" : {
+                "navigationBarTitleText": "修改用户名",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/attestation",
+            "style" : {
+                "navigationBarTitleText": "推广认证",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/editpwd",
+            "style" : {
+                "navigationBarTitleText": "修改密码",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/editphone",
+            "style" : {
+                "navigationBarTitleText": "修改手机号",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/editdealpwd",
+            "style" : {
+                "navigationBarTitleText": "提现密码",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/bindmail",
+            "style" : {
+                "navigationBarTitleText": "绑定邮箱",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/bindphone",
+            "style" : {
+                "navigationBarTitleText": "绑定手机号",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/advice",
+            "style" : {
+                "navigationBarTitleText": "反馈与建议",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/rule",
+            "style" : {
+                "navigationBarTitleText": "协议和规则",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+        {
+            "path" : "pages/my/public",
+            "style" : {
+                "navigationBarTitleText": "新禧公众号",
+                "app-plus":{
+                    "bounce": "none"
+                }
+            }
+        },
+		{
+		    "path": "pages/home/friendsearch",
+		    "style": {
+		        "navigationBarTitleText": "搜索朋友圈",
+                "app-plus":{
+                    "bounce": "none"
+                }
+		    }
+		},
+		{
+			"path": "pages/home/editcustomer",
+			"style": {
+			    "navigationBarTitleText": "编辑客户信息",
+                "app-plus":{
+                    "bounce": "none"
+                }
+			}
+		},
+        
+		
+        {
+            "path" : "pages/my/shareapp",
+            "style" : {
+				 "navigationBarTitleText": "分享APP",
+                 "app-plus":{
+                     "bounce": "none"
+                 }
+			}
+        }
+        ,{
+            "path" : "pages/my/sharecode",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "保存图片",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/my/invitelist",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "推荐详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/my/inviterule",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "活动规则",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+    "subPackages":[
+        {
+            "root":"page_join",
+            "pages":[
+                {
+                    "path": "index",
+                    "style": {
+                        "navigationBarTitleText": "加入新禧",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "identity",
+                    "style": {
+                        "navigationBarTitleText": "身份认证",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "fillmsg",
+                    "style": {
+                        "navigationBarTitleText": "填写信息",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "audit",
+                    "style": {
+                        "navigationBarTitleText": "人工审核",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "certificate",
+                    "style": {
+                        "navigationBarTitleText": "职业资质证",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "datareplenish",
+                    "style": {
+                        "navigationBarTitleText": "资料补充",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "homejoin",
+                    "style": {
+                        "navigationBarTitleText": "加入新禧",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                }
+                // {
+                //     "path" : "pages/home/training",
+                //     "style" : {
+                //          "navigationBarTitleText": "精英训练营",
+                //          "app-plus":{
+                //              "bounce": "none"
+                //          }
+                //     }
+                // }
+                
+            ]
+        },
+        {
+            "root": "page_assets",
+            "pages": [
+                {
+                    "path" : "index",
+                    "style" : {
+                        "navigationBarTitleText": "我的资产",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "bankcard",
+                    "style" : {
+                        "navigationBarTitleText": "银行卡",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "addbankcard",
+                    "style" : {
+                        "navigationBarTitleText": "添加银行卡",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "selmoneyaccount",
+                    "style" : {
+                        "navigationBarTitleText": "选择收款账户",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "withdrawal",
+                    "style" : {
+                        "navigationBarTitleText": "提现",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "withdrawalrecord",
+                    "style" : {
+                        "navigationBarTitleText": "提现记录",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "moneylist",
+                    "style" : {
+                        "navigationBarTitleText": "资金明细",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "moneydetail",
+                    "style" : {
+                        "navigationBarTitleText": "资金具体明细",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "withdrawaldetail",
+                    "style" : {
+                        "navigationBarTitleText": "提现具体明细",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "policyquery",
+                    "style" : {
+                		 "navigationBarTitleText": "保单查询",
+                         "app-plus":{
+                             "bounce": "none"
+                         }
+                	}
+                },
+                {
+                    "path" : "policydetail",
+                    "style" : {
+                		 "navigationBarTitleText": "保单详情",
+                         "app-plus":{
+                             "bounce": "none"
+                         }
+                	}
+                }
+            ]
+        },
+        {
+            "root": "page_h5",
+            "pages": [
+                {
+                    "path" : "register",
+                    "style" : {
+                        "navigationBarTitleText": "注册",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "registerend",
+                    "style" : {
+                        "navigationBarTitleText": "注册成功",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "root": "page_other",
+            "pages": [
+                {
+                    "path": "ebook/userdeal",
+                    "style": {
+                        "navigationBarTitleText": "用户协议",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "ebook/privacypolicy",
+                    "style": {
+                        "navigationBarTitleText": "隐私政策",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "ebook/productnotify",
+                    "style": {
+                        "navigationBarTitleText": "产品告知书",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                	"path":"ebook/invitationrule",
+                	"style": {
+                	    "navigationBarTitleText": "邀请规则说明",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                	}
+                },
+                {
+                	"path":"ebook/extension",
+                	"style": {
+                	    "navigationBarTitleText": "推广规则",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                	}
+                },
+                {
+                    "path" : "ebook/personal",
+                	 "style": {
+                		  "navigationBarTitleText": "个人信息使用授权书",
+                          "app-plus":{
+                              "bounce": "none"
+                          }
+                	 }
+                },
+                {
+                    "path" : "ebook/register",
+                    "style" : {
+                		 "navigationBarTitleText": "用户注册及使用协议",
+                         "app-plus":{
+                             "bounce": "none"
+                         }
+                	}
+                },
+                {
+                    "path": "message/index",
+                    "style": {
+                        "navigationBarTitleText": "消息中心",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "message/productstatus",
+                    "style": {
+                        "navigationBarTitleText": "产品动态",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "message/systemnotice",
+                    "style": {
+                        "navigationBarTitleText": "系统通知",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "message/productnotice",
+                    "style": {
+                        "navigationBarTitleText": "产品通知",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "message/marketing",
+                    "style": {
+                        "navigationBarTitleText": "营销活动",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "message/orderinfo",
+                    "style": {
+                        "navigationBarTitleText": "订单信息",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "order/orderlist",
+                    "style" : {
+                        "navigationBarTitleText": "订单列表",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path" : "order/orderdetail",
+                    "style" : {
+                        "navigationBarTitleText": "保单详情",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "test/selpicker",
+                    "style": {
+                        "navigationBarTitleText": "多级联动",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "test/fold",
+                    "style": {
+                        "navigationBarTitleText": "折叠",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                },
+                {
+                    "path": "thenewagent/index",
+                    "style": {
+                        "navigationBarTitleText": "新代理人专享",
+                        "app-plus":{
+                            "bounce": "none"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1077FF",
+    "backgroundColor": "#ffffff",
+    "list": [
+        {
+            "pagePath": "pages/home/index",
+            "text": "首页",
+            "iconPath": "static/icon_a_1.png",
+            "selectedIconPath": "static/icon_a.png"
+        },
+        {
+            "pagePath": "pages/product/index",
+            "text": "产品库",
+            "iconPath": "static/icon_b_1.png",
+            "selectedIconPath": "static/icon_b.png"
+        },
+        {
+            "pagePath": "pages/train/index",
+            "text": "新闻中心",
+            "iconPath": "static/icon_c_1.png",
+            "selectedIconPath": "static/icon_c.png"
+        },
+        {
+            "pagePath": "pages/my/index",
+            "text": "我的",
+            "iconPath": "static/icon_d_1.png",
+            "selectedIconPath": "static/icon_d.png"
+        }
+    ]
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "test",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "backgroundColor": "#F3F3F3",
+        "navigationStyle": "custom"
+    },
+    "condition" : { //模式配置，仅开发期间生效
+        "current": 0, //当前激活的模式(list 的索引项)
+        "list": [
+            {
+                "name": "首页",
+                "path": "pages/home/index",
+                "query": ""
+            }
+        ]
+    }
+}

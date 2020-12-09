@@ -1,0 +1,214 @@
+<template>
+    <view class="content">
+        <x-nav-bar :no-border="true" title="设置"></x-nav-bar>
+        <!-- <view class="list">
+            <view class="item">
+                <view class="left">保单收入可见</view>
+                <view class="right">
+                    <switch color="#FF5000" style="transform:scale(0.8); width: 100rpx;"  checked @change="switch1Change" />
+                </view>
+            </view>
+            <view class="item">
+                <view class="left">消息推动设置</view>
+                <view class="right">
+                    <switch color="#FF5000" style="transform:scale(0.8); width: 100rpx;"  checked @change="switch1Change" />
+                </view>
+            </view> 
+        </view>-->
+		
+        <view class="list top">
+            <x-list-item title="公司信息" @click="openUrl('https://www.xinxiichina.com/')"></x-list-item>
+            <x-list-item title="协议与规则" @click="openUrl('./rule')"></x-list-item>
+            <!-- #ifdef APP-PLUS -->
+            <x-list-item title="清除缓存" @click="showCacheModal" arrow="0" fontColor="#999" :msg="fileSizeString"></x-list-item>
+            <!-- #endif -->
+            <x-list-item v-if="version" title="版本信息" arrow="0" fontColor="#999" @click="upload" :msg="version"></x-list-item>
+			<x-list-item title="分享APP" @click="shareapp"></x-list-item>
+            <x-list-item title="新禧公众号" border="0" @click="openUrl('./public')"></x-list-item>
+        </view>
+        <button v-if="isLogin" class="btn" @click="showModal">退出登录</button>
+        <button v-if="isLogin" class="btn" @click="showCancelLationModal">注销账号</button>
+		<x-modal ref="modal" content="确定退出当前账号吗?" @sure="loginOut"></x-modal>
+		<x-modal ref="cachemodal" title="提示" content="确定要清除缓存吗?" @sure="clear"></x-modal>
+		<x-modal ref="cancellationmodal" title="提示" content="确定要注销账号吗?" @sure="cancelLation"></x-modal>
+    </view>
+</template>
+
+<script>
+    import {checkUpdateApp} from '@/common/utils'
+	import {updateUserinfo} from '@/common/api'
+    import {mapState,mapMutations} from 'vuex'
+    export default{
+		computed:{
+			...mapState(["isLogin"])
+		},
+        data () {
+            return {
+                fileSizeString: null,
+                version: '',
+				assetsData:null,
+				username:''
+            }
+        },
+		onShow() {
+			if(this.isLogin){
+			    updateUserinfo(this)
+			    this.getAssets()
+			}
+		},
+        onLoad() {
+          this.formatSize()
+          // #ifdef APP-PLUS
+          this.version = plus.runtime.version
+          // #endif
+		  
+		  
+        },
+        methods:{
+            ...mapMutations(['LOGOFF']),
+			loginOut(){
+				this.LOGOFF()
+				this.showToast('退出成功')
+				setTimeout(() => {
+					uni.switchTab({
+						url: '/pages/my/index'
+					})
+				}, 1500)
+			},
+            upload(){
+                // #ifdef APP-PLUS
+                checkUpdateApp()
+                // #endif
+            },
+			showCacheModal(){
+				this.$refs.cachemodal.open()
+			},
+            showModal(){
+                // uni.showModal({
+                // 	title: '提示',
+                // 	content: '确定退出当前账号吗',
+                // 	cancelColor: '#999',
+                // 	confirmColor: '#FF5000',
+                // 	success: (res) => {
+                // 		if (res.confirm) {
+                // 			this.LOGOFF()
+                //             this.showToast('退出成功')
+                // 			setTimeout(() => {
+                // 				uni.switchTab({
+                // 					url: '/pages/my/index'
+                // 				})
+                // 			}, 1500)
+                // 		} else if (res.cancel) {
+                // 			console.log('用户点击取消');
+                // 		}
+                // 	}
+                // })
+				this.$refs.modal.open()
+            },
+            formatSize() {  
+                // #ifdef APP-PLUS
+                let that = this
+                plus.cache.calculate( function (size) {  
+                    let sizeCache = parseInt(size)
+                    console.log(sizeCache);
+                    if (sizeCache == 0) {  
+                        that.fileSizeString = "0B"
+                    } else if (sizeCache < 1024) {  
+                        that.fileSizeString = sizeCache + "B"
+                    } else if (sizeCache < 1048576) {  
+                        that.fileSizeString = (sizeCache / 1024).toFixed(2) + "KB"
+                    } else if (sizeCache < 1073741824) {  
+                        that.fileSizeString = (sizeCache / 1048576).toFixed(2) + "MB"
+                    } else {  
+                        that.fileSizeString = (sizeCache / 1073741824).toFixed(2) + "GB"
+                    }  
+                })
+                // #endif
+            },
+            clear() {  
+                // #ifdef APP-PLUS
+                // this.showModel('','确定要清除缓存吗？',()=>{
+                    let that = this
+                    let os = plus.os.name
+                    if (os == 'Android') {
+                        let main = plus.android.runtimeMainActivity()
+                        let sdRoot = main.getCacheDir()
+                        let files = plus.android.invoke(sdRoot, "listFiles")
+                        let len = files.length
+                        for (let i = 0; i < len; i++) {  
+                            let filePath = '' + files[i] // 没有找到合适的方法获取路径，这样写可以转成文件路径  
+                            plus.io.resolveLocalFileSystemURL(filePath, function(entry) {  
+                                if (entry.isDirectory) {  
+                                    entry.removeRecursively(function(entry) { //递归删除其下的所有文件及子目录  
+                                        that.showToast('缓存清理完成')
+                                        that.formatSize() // 重新计算缓存  
+                                    }, function(e) {  
+                                        console.log(e.message)  
+                                    })
+                                } else {  
+                                    entry.remove() 
+                                }  
+                            }, function(e) {  
+                                console.log('文件路径读取失败')  
+                            });  
+                        }  
+                    } else { // ios  
+                        plus.cache.clear(function() {  
+                            that.showToast('缓存清理完成')
+                            that.formatSize()
+                        })
+                    }
+                // })
+                // #endif
+            },
+			
+			getAssets(){
+			    this.$api.get('member/login/getLoginMember.do').then( res => {
+			        if(res.success){
+			            this.assetsData = res.data
+						res.data.username !== '' ? this.username = res.data.username : this.username = res.data.mobile
+			        }
+			    })
+			},
+			
+			showCancelLationModal(){
+				this.$refs.cancellationmodal.open()
+			},
+			
+			//注销
+			cancelLation(){
+				console.log(this.username)
+				this.$api.get("member/login/cancel.do",{params:{username:this.username}}).then(res=>{
+					console.log(res)
+					if(res.success){
+						this.LOGOFF()
+						this.showToast(res.description)
+						setTimeout(() => {
+							uni.switchTab({
+								url: '/pages/my/index'
+							})
+						}, 1500)
+					}
+				})
+			},
+			
+			//分享app
+			shareapp(){
+				this.openUrl('./shareapp')
+			}
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.list{background-color: #fff; margin-top: 18rpx;
+    &.top{margin-top: 24rpx;}
+    .item{display: flex; align-items: center; justify-content: space-between; height: 88rpx; border-bottom: 1px solid #F0F0F0; font-size: 32rpx;
+        &:last-of-type{border: none;}
+        .right{color: #999;
+            image{width: 14rpx; height: 24rpx;}
+        }
+    }
+}
+.btn{width: 702rpx; height: 88rpx; line-height: 88rpx; margin: 48rpx auto 0; font-size: 32rpx; color: $xinxii-theme-color; background-color: #fff; border-radius: 8rpx;}
+</style>

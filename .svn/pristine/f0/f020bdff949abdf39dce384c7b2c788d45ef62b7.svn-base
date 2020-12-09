@@ -1,0 +1,64 @@
+<template>
+	<view class="theNewAgent">
+		<x-nav-bar :no-border="true" title="新代理人专享"></x-nav-bar>
+		<view class="bg_box">
+			<view class="title">京东安联全民综合意外险</view>
+			<view class="text_box">
+				<image lazy-load class="iamgebox" src="../static/starProject/tick.png" mode=""></image>
+				<view class="text">保障全面综合意外险 不限社保用药</view>
+			</view>
+			<view class="text_box">
+				<image lazy-load class="iamgebox" src="../static/starProject/tick.png" mode=""></image>
+				<view class="text">涵盖意外门诊/住院医疗/住院津贴</view>
+			</view>
+			<view class="centerbox"></view>
+		</view>
+		<view class="footerbox">
+			<view class="footerboxImg">
+				<view class="text_1">每日1元，专享104万意外保障金</view>
+				<view class="text_2">新代理人专享</view>
+				<button class="btn" size="mini" type="default">立即投保</button>
+				<view class="line"></view>
+				<view class="footerText">
+					<text class="text_3">说明：</text><text class="text_4">104万保障金按最高投保费计算得出</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data () {
+			return {}
+		},
+		methods:{
+			
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.theNewAgent{position: absolute;width: 100%;height: 100%;
+		.bg_box{height: 750rpx;background-image: url("../static/starProject/newAgent_bj.png");background-repeat: no-repeat;background-size: 100% 100%;padding: 0 20rpx;
+			.title{font-size: 56rpx;font-weight: bold;color: #FEFEFE;text-align: center;margin-bottom: 14rpx;padding-top: 48rpx;}
+			.text_box{display: flex;align-items: center;justify-content: center;margin-bottom: 10rpx;
+				.iamgebox{width: 26rpx;height: 20rpx;margin-right: 4rpx;}
+				.text{font-size: 26rpx;font-weight: bold;color: #FFFFFF;}
+			}
+			.centerbox{height: 476rpx;background-image: url("../static/starProject/exclusive.png");background-repeat: no-repeat;background-size: 100% 100%;}
+		}
+		.footerbox{background-color: #FCBE5A;padding: 0 20rpx;position: relative;height: 694rpx;
+			.footerboxImg{position: absolute;top: -58rpx;height: 568rpx;background-image: url("../static/starProject/white_bj.png");background-repeat: no-repeat;background-size: 100% 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;padding: 48rpx 46rpx 72rpx 46rpx;
+				.text_1{font-size: 28rpx;color: #9B9B9B;}
+				.text_2{font-size: 72rpx;font-weight: bold;color: #FF5000;margin-top: 48rpx;}
+				.btn{width: 352rpx;height: 80rpx;background: linear-gradient(136deg, #FE582D 0%, #FF944E 100%);border-radius: 40rpx;font-size: 32rpx;font-weight: bold;color: #FFFFFF;margin-top: 48rpx;display: flex;justify-content: center;align-items: center;}
+				.line{width: 618rpx;height: 2rpx;background-color: #FCBE5A;margin-top: 60rpx;margin-bottom: 46rpx;}
+				.footerText{display: flex;align-items: center;font-size: 28rpx;
+					.text_3{color: #FF5000;}
+					.text_4{color: #9B9B9B;}
+				}
+			}
+		}
+	}
+</style>

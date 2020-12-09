@@ -1,0 +1,131 @@
+<template>
+    <view class="content">
+        <x-nav-bar rightWidth="24rpx" title=" ">
+            <view class="head">
+                <view class="search-box">
+                    <input type="text" focus="focus" :value="currentVal" @input="inputload" confirm-type="search" @confirm="search" placeholder-class="input-pld">
+                    <x-icon class="img-search" color="#999" size="32" type="search"></x-icon>
+                </view>
+                <text @click.stop="search">搜索</text>
+            </view>
+        </x-nav-bar>
+        <view v-if="isSearch">
+            <view class="hotel group" v-if="hotelList&&hotelList.length>0">
+                <view class="tit">热门搜索</view>
+                <view class="list">
+                    <view class="item" @click="hotelitem(item.label)" v-for="(item,index) in hotelList" :key="index">{{item.label}}</view>
+                </view>
+            </view>
+            <view class="history group" v-if="historyList&&historyList.length>0">
+                <view class="tit">
+                    <text>历史搜索</text>
+                    <x-icon type="del" size="38" @click="clear" color="#999"></x-icon>
+                </view>
+                <view class="list">
+                    <view class="item" @click="historyitem(item)" v-for="(item,index) in historyList" :key="index">{{item}}</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import { lastDateTime } from '@/common/utils'
+    export default{
+        props:{
+            hotelList:{
+                type: Array
+            },
+            historyList:{
+                type: Array
+            },
+            product: {
+                type: Array
+            },
+            trainList: {
+                type: Array
+            },
+            value: {
+            	type: [String, Number],
+            	default: ''
+            },
+            isSearch:{
+                type: [Boolean, String],
+                default: true
+            }
+        },
+        data () {
+            return {
+                currentVal: this.value
+            }
+        },
+        computed:{
+            creadTime(){
+                return (time) => {
+                    let t = time.replace(/-/g, '/')
+                    return lastDateTime(new Date(t).getTime())
+                }
+            }
+        },
+        watch:{
+            value (val) {
+            	this.setCurrentValue(val);
+            }
+        },
+        methods: {
+            inputload(event) {
+            	let value = event.target.value
+            	if (value) {
+            		value = value.trim()
+            	}
+            	this.$emit('input', value)
+            },
+           
+            setCurrentValue(value) {
+            	if (value === this.currentVal) return
+            	this.currentVal = value
+            },
+            search (e) {
+                let val = e.detail.value
+                if(!e.detail.value){
+                    val = this.currentVal
+                }
+                this.$emit('search',val)
+            },
+            hotelitem (item) {
+                this.$emit('hotelitem',item)
+            },
+            clear () {
+                this.$emit('clear')
+            },
+            historyitem (item) {
+                this.$emit('historyitem',item)
+            }
+        }
+    }
+</script>
+
+<style lang="scss">
+.head{display: flex; align-items: center; justify-content: space-between; height: 100%;
+  .search-box{position: relative;
+      input{width: 560rpx; height: 60rpx; background-color: #F6F7F8; border-radius: 32rpx; padding-left: 80rpx; color: #999;}
+      .input-pld{font-size: 28rpx; color: #999;}
+      .img-search{width: 32rpx; height: 32rpx; position: absolute; left: 24rpx; top: 50%; transform: translateY(-50%);}
+  }
+  text{color: $xinxii-theme-color; font-size: 28rpx;}
+}
+// .content{position: absolute; width: 100%; min-height: 100%; background-color: #fff; padding: 0 24rpx;
+.content{ background-color: #fff; padding: 0 24rpx;
+    .tit{display: flex; justify-content: space-between; align-items: center; font-size: 32rpx; font-weight: bold; padding: 24rpx 0;}
+    .history{font-size: 0;
+        >text{font-size: 32rpx;}
+        image{width: 32rpx; height: 32rpx;}
+    }
+    .group{
+        .list{display: flex; flex-wrap: wrap; padding-bottom: 6rpx;
+            .item{font-size: 28rpx; color: #999; line-height: 40rpx; padding: 10rpx 24rpx; background-color: #F1F2F3; border-radius: 30rpx; margin-right: 24rpx; margin-bottom: 18rpx;}
+        }
+    }
+    
+}
+</style>

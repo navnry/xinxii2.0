@@ -1,0 +1,88 @@
+<template>
+	<view class="content">
+		<x-nav-bar :no-border="true" :title="title"></x-nav-bar>
+		<view class="main">
+			<view v-show="type == 1">
+				<x-input type="tel" v-model="userinfo.mobile" disabled showNationCode="true" placeholder="请输入手机号"></x-input>
+				<x-input type="captcha" maxlength="6" placeholder="手机验证码" captcha-type="6"  v-model="sendData.verifyCode" :captchaMobile="userinfo.mobile"></x-input>
+				<button class="btn" @click="next()">下一步</button>
+			</view>
+			<view v-show="type == 2">
+				<x-input type="tel" v-model="sendData.phone" showNationCode="true" placeholder="请输入新绑定手机号码"></x-input>
+				<x-input type="captcha" maxlength="6" placeholder="手机验证码" captcha-type="7"  v-model="sendData.verifyCode" :captchaMobile="sendData.phone"></x-input>
+				<button class="btn" @click="resetPhone">确认</button>
+			</view>
+		</view>
+	</view>
+</template>
+<script>
+import { checkPhone } from '@/common/utils';
+import { updateUserinfo } from '@/common/api';
+import { mapState } from 'vuex';
+export default {
+	data() {
+		return {
+			sendData: {
+				verifyCode: '',
+				phone: ''
+			},
+			info: {
+				pwd: ''
+			},
+			type: 1,
+			title: '更换手机号码'
+		};
+	},
+	computed: mapState(['userinfo']),
+	onLoad() {
+		if (!this.userinfo.mobile) {
+			this.title = '绑定手机号码';
+			this.type = 2;
+		}
+	},
+	methods: {
+		next() {
+			this.sendData.verifyCode = this.sendData.verifyCode.trim();
+			if (!this.sendData.verifyCode) {
+				this.showToast('请输入验证码');
+				return;
+			}
+			this.$api.post('member/member/checkVerifyCode.do', this.sendData).then(res => {
+				if (res.success) {
+					this.type = 2;
+					this.sendData.phone = '';
+					this.sendData.verifyCode = '';
+				}
+			});
+		},
+		resetPhone() {
+			if (this.type != 1 && !checkPhone(this.sendData.phone)) {
+				this.showToast('请输入正确手机号');
+				return;
+			}
+			this.sendData.verifyCode = this.sendData.verifyCode.trim();
+			if (!this.sendData.verifyCode) {
+				this.showToast('请输入验证码');
+				return;
+			}
+			this.$api.post('member/member/resetMobile.do', this.sendData).then(res => {
+				if (res.success) {
+					this.showToast('绑定手机成功');
+					updateUserinfo(this);
+					setTimeout(() => {
+						this.backPage();
+					}, 1500);
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss" scoped>
+.content { position: absolute; width: 100%; min-height: 100%; background-color: #fff; }
+.main { padding: 0 72rpx; margin-top: 180rpx;
+	.item {margin-top: 18rpx;}
+	.btn {height: 88rpx; line-height: 88rpx; border-radius: 8rpx; color: #fff; font-size: 32rpx; background-color: $xinxii-theme-color; margin-top: 104rpx;}
+}
+</style>

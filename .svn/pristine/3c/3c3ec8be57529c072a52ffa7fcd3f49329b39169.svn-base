@@ -1,0 +1,149 @@
+<template>
+    <view class="content">
+        <x-nav-bar :no-border="true" title="资料补充"></x-nav-bar>
+        <view class="group">
+            <view class="tit">补充资料</view>
+            <x-input class="list-item" v-model="schoolName" leftText="毕业院校名称" type="text" placeholder="请输入毕业院校"></x-input>
+            <x-list-item title="家庭住址" :msg="addressMsg" @click="selAddress"></x-list-item>
+			<x-input class="list-item" v-model="address" leftText="详细地址" type="text" placeholder="街道,门牌号等"></x-input>
+            <view class="photo-box">
+                <view class="txt">上传毕业证照片</view>
+                <view class="photo">
+					<view v-if="graduationPicture" class="photo" @click="chooseImage()"><image lazy-load class="bg" :src="graduationPicture + '?imageView2/1/w/158/h/98'" mode=""></image></view>
+                    <image lazy-load v-else @click="chooseImage()" class="bg" src="./static/join/join_data_diploma.png" mode=""></image>
+                </view>
+                <view class="tips">
+                    <view class="txt">注意事项</view>
+                    <view class="tip">*请确保照片清晰，可选择毕业证或学信网截图</view>
+                </view>
+            </view>
+        </view>
+        <button class="btn" @click="next">提交</button>
+        <x-level-picker ref="address"
+            v-model="value3"
+            mode="multiSelector"
+            cancel-color="#999"
+            confirm-color="#ff5000"
+            :list="areaList"
+            :level="3"
+            @confirm="handleConfirm">
+        </x-level-picker>
+    </view>
+</template>
+
+<script>
+    import areaData from '@/components/x-level-picker/area-data-min.js'
+    import {uploadImage} from '@/common/utils'
+    // import constVal from '../../common/utils/constval.js'
+    import constVal from '@/common/utils/constval.js'
+	import { mapState } from 'vuex';
+    export default{
+        data () {
+            return {
+                addressMsg: '请选择地区',
+                value3: [],
+                areaList: areaData,
+				id:'',
+				schoolName:'',
+				graduationPicture:'',
+				province:'',
+				city:'',
+				area:'',
+				address:'',
+            }
+        },
+		computed: { ...mapState(['userinfo']) },
+		onLoad(option) {
+			if (!!this.userinfo && Object.keys(this.userinfo).length == 0) {
+				//没有用户信息返回登录页面
+				uni.redirectTo({
+					url: '/pages/my/login'
+				});
+			}
+			if(option!=null){
+				this.id = option.id
+			}
+			//this.graduationPicture ='https://xinxii-dev-1302479696.picgz.myqcloud.com/logo/1595398540243.jpg'
+		},
+        methods:{
+            selAddress(){
+                this.$refs.address.show()
+            },
+            handleConfirm (item) {
+                // let arr = []
+                // for (let val of item.item) {
+                //     arr.push(val.label)
+                // }
+                // this.addressMsg = arr.join('-')
+				this.province = item.item[0].label
+				this.city = item.item[1].label
+				this.area = item.item[2].label
+				this.addressMsg = this.province+"-"+this.city+"-"+this.area
+            },
+			next(){
+				if(!this.schoolName){
+					this.showToast('请输入毕业院校')
+					return
+				}
+				if(!this.province || !this.city || !this.area){
+					this.showToast('请选择地区')
+					return
+				}
+				if(!this.address){
+					this.showToast('请输入地址')
+					return
+				}
+				if(!this.graduationPicture){
+					this.showToast('请上传毕业证照片')
+					return
+				}
+				this.supplementData()
+			},
+			supplementData(){
+				let params = {
+					id:this.id,
+					schoolName:this.schoolName,
+					graduationPicture:this.graduationPicture,
+					province:this.province,
+					city:this.city,
+					area:this.area,
+					address:this.address 
+				}
+				console.log(params)
+				this.$api.post('member/qualification/supplementData.do',params).then( res => {
+				    if(res.success){
+				        this.showToast('提交成功')
+						setTimeout(()=>{
+							this.openUrl('../my/index',2)
+						},1000)
+				    }
+				})
+			},
+			chooseImage() {
+				let url = constVal.UPLOAD_IMG_URL+'mobile/file/img/upload2.do',
+					count = 1
+				uploadImage(url,'CERTIFICATE',count,this.userinfo.token,(res)=>{
+				    this.graduationPicture = res.data.path
+				})
+			}
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.group{background-color: #fff; border-radius: 12rpx; margin: 24rpx auto 0; width: 702rpx;
+    .tit{font-size: 32rpx; font-weight: bold; line-height: 44rpx; padding: 24rpx 24rpx 0; color: $xinxii-theme-color;}
+    .list-item{margin: 0 24rpx; text-align: right;}
+}
+.photo-box{padding: 24rpx 24rpx 34rpx;
+    .txt{font-size: 28rpx; line-height: 40rpx;}
+    .photo{font-size: 0;
+        image{width: 212rpx; height: 132rpx; margin-top: 24rpx;}
+    }
+    .tips{color: #999;
+        .txt{font-size: 28rpx; padding: 24rpx 0 12rpx;}
+        .tip{font-size: 24rpx;}
+    }
+}
+.btn{margin: 48rpx auto 24rpx; border-radius: 8rpx; width: 702rpx; height: 88rpx; line-height: 88rpx; font-size: 32rpx; color: #fff; font-weight: bold; background-color: $xinxii-theme-color;}
+</style>

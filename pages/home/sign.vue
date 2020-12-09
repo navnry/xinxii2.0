@@ -1,0 +1,272 @@
+<template>
+	<view class="content">
+		<x-nav-bar noBlank="true" :noBorder="true" title="签到" :background-color="topBackgroundColor" :no-border="topNoBorder" :color="topColor"></x-nav-bar>
+        <view class="mask" v-show="isShow"></view>
+        <view class="pop" v-show="isShow">
+            <view class="top">
+                <image lazy-load src="../../static/sign/sign_pop_head.png" mode=""></image>
+                <view class="txt-box">
+                    <view class="tit">恭喜你获得一份日签</view>
+                    <view class="tip">每一份日签代表一份美好生活的开始</view>
+                </view>
+            </view>
+            <image lazy-load class="success" src="../../static/sign/sign_success.png" mode=""></image>
+            <view class="txt">您的日签已制作完成</view>
+            <button class="now_see" @click="seeBanner">立即查看</button>
+            <view class="close" @click="isShow = false">
+                <x-icon type="close"></x-icon>
+            </view>
+        </view>
+        <view class="top-bg">
+            <image lazy-load src="../../static/sign/sign_bg.png" mode=""></image>
+        </view>
+        <view class="sign-box">
+            <view class="tit">当月打卡天数<text class="text">{{signNum}}</text>天</view>
+            <view class="time-box">
+                <view class="item" :class="{act : current === index}" v-for="(item,index) in signData" :key="index" @click="seeDay(item,index)">
+                    <view :class="{newDay : item.newDay == 1}">
+						<view class="icon-wrap">
+							<x-icon size="32" :type="item.status == 1? 'qiandao':'weiqiandao'" color="#CDCDCD"></x-icon>
+						</view>
+                        <view class="week">{{item.week}}</view>
+                    </view>
+                </view>
+            </view>
+			<view class="btn-box">
+				<button v-if="isNow&&!isSign" class="btn" @click="sign">签到领日签</button>
+				<button v-else-if="isSign" class="btn" @click="seeBanner">查看日签海报</button>
+				<button v-else-if="!isNow&&!isSign" :class="{end : !isNow&&!isSign}" class="btn">签到领日签</button>
+			</view>
+        </view>
+        <view class="info">
+            <view class="tit-box">
+                <view></view>
+                <view class="title">
+                    <view class="line1"></view>
+                    <view class="txt">签到说明</view>
+                    <view class="line2"></view>
+                </view>
+                <view></view>
+            </view>
+            <view class="list">
+                <view class="item">· 本月签到即日起至{{nowYear}}年{{month}}月{{new Date(nowYear,month,0).getDate()}}日</view>
+                <view class="item">· 每日签到一次，可获得专属精美打卡海报1张</view>
+                <view class="item">· 成为禧小保注册用户，才可使用打卡功能</view>
+                <!-- <view class="item">· 海报会显示专属名字，如需更改请更改昵称</view> -->
+                <view class="item">· 签到活动最终解释权归新禧保险经纪有限公司所有</view>
+            </view>
+        </view>
+	</view>
+</template>
+<script>
+    import {formatTime} from '@/common/utils'
+	export default {
+		data() {
+			return {
+				topColor: '#fff',
+				topBackgroundColor: 'transparent',
+				topNoBorder: true,
+                signNum: 0, // 当月打卡天数 
+                signJoinNum: 0, // 当月连续打卡天数
+                signData: [
+                    {week:'周一', date:'', newDay: 0, status: 0},
+                    {week:'周二', date:'', newDay: 0, status: 0},
+                    {week:'周三', date:'', newDay: 0, status: 0},
+                    {week:'周四', date:'', newDay: 0, status: 0},
+                    {week:'周五', date:'', newDay: 0, status: 0},
+                    {week:'周六', date:'', newDay: 0, status: 0},
+                    {week:'周日', date:'', newDay: 0, status: 0}
+                ],
+                current: '',
+                isShow: false,
+                isSign: false ,// 今天是否打卡
+                nowDate: '',
+                nowYear: '',
+                month: '',
+                isNow: true ,// 是不是今天
+                bannerUrl: ''
+			}
+		},
+        onShow() {
+            this.getDates()
+            this.getSignList()
+            this.nowYear = new Date().getFullYear()
+            this.month = new Date().getMonth() + 1
+            
+            this.getSignDetail(this.nowYear + '-' + this.nowDate, this.nowDate)
+        },
+		onLoad() {
+            
+		},
+		methods: {
+            getDates() { // 获取当前周的时间
+                let timesStamp = new Date().getTime()
+                let currenDay = new Date().getDay()
+                for(let i = 0; i < 7; i++) {
+                    let time = timesStamp + 24 * 60 * 60 * 1000 * (i - (currenDay + 6) % 7)
+                    this.signData[i].date = formatTime(time,'MM-dd')
+                    if(time == timesStamp){
+                        this.signData[i].newDay = 1
+                        this.nowDate = this.signData[i].date
+                    }
+                }
+            },
+            sign(){
+                this.$api.get('member/clockIn/addClockIn.do').then( res => {
+                    if(res.success){
+                        this.isShow = true
+                        this.isSign = true
+                        this.signNum++
+                        this.getSignList()
+                        this.getSignDetail(this.nowYear + '-' + this.nowDate, this.nowDate)
+                    }
+                })
+            },
+            seeBanner(){
+                uni.navigateTo({
+                    url: `./signbanner?url=${this.bannerUrl}`
+                })
+            },
+            seeDay(item,index){
+                if(this.current === index) return
+                let date1 = this.nowYear + '-' + this.nowDate 
+                let date2 = this.nowYear + '-' + item.date
+                if(new Date(date1) < new Date(date2)) return // 超过今天不允许查看
+                this.current = index
+                let date = this.nowYear + '-' + item.date
+                this.getSignDetail(date,item.date)
+            },
+			getSignList() {
+				this.$api.get('member/clockIn/clockInlist.do').then(res => {
+                    if(res.success){
+                        this.signNum = res.data.count
+                        let list = res.data.list
+                        for(let i of list){
+                            if(new Date(this.nowYear + '-' + this.nowDate) < new Date(formatTime(i.createDate*1000,'yyyy-MM-dd'))) return  // 超过了今天的数据
+                            for (let item of this.signData) {
+                                if(item.date == formatTime(i.createDate*1000,'MM-dd')){
+                                    item.status = i.status
+                                }
+                            }
+                            
+                        }
+                        
+                    }
+				})
+			},
+            getSignDetail(date,date1){
+                this.$api.get('member/clockIn/ClockMessage.do',{params:{date}}).then( res => {
+                    if(res.success){
+                        if(date1 === this.nowDate){
+                            this.isNow = true
+                        }else{
+                            this.isNow = false
+                        }
+                        if(res.data&&res.data.status == 1){
+                            this.isSign = true
+                            this.bannerUrl = res.data.posterPath
+                        }else{
+                            this.isSign = false
+                        }
+                    }
+                })
+            },
+            onPageScroll(res) {
+              if(res.scrollTop > 200){
+                this.topBackgroundColor = 'rgba(255, 255, 255, 1)'
+                this.topColor = 'rgb(0,0,0)'
+                this.topNoBorder = false
+              } else {
+                let alpha = res.scrollTop / 200
+                let x = parseInt(255 * (1 - alpha))
+                this.topColor = 'rgb(' + x + ',' + x + ',' + x + ')'
+                this.topBackgroundColor = 'rgba(255, 255, 255, ' + alpha + ')'
+                this.topNoBorder = true
+              }
+            }
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+.mask{z-index: 1000;}
+.pop{position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 1001; width: 622rpx; height: 760rpx; background-color: #fff; border-radius: 16rpx; text-align: center;
+    .top{font-size: 0; position: relative; width: 100%; height: 240rpx; text-align: center;
+        image{width: 100%; height: 100%; position: absolute; left: 0; top: 0;}
+        .txt-box{position: absolute; width: 100%; height: 100%; left: 0; top: 0; z-index: 1; padding: 72rpx 0 68rpx;
+            .tit{font-size: 32rpx; color: #F1CF8C;}
+            .tip{font-size: 24rpx; color: #EBD184; margin-top: 22rpx;}
+        }
+    }
+    .success{width: 162rpx; height: 184rpx; margin: 72rpx 0 24rpx;}
+    .txt{font-size: 32rpx; color: #BFC2CC;}
+    .now_see{width: 526rpx; height: 88rpx; line-height: 88rpx; color: #fff; border-radius: 8rpx; margin: 60rpx auto 0; background-color: $xinxii-theme-color;}
+    .close{position: absolute; left: 50%; bottom: -88rpx; transform: translateX(-50%); font-size: 0;
+        image{width: 40rpx; height: 40rpx;}
+    }
+}
+.top-bg{width: 100%; height: 620rpx; font-size: 0; position: relative;
+    image{width: 100%; height: 100%; position: absolute; left: 0; top: 0;}
+    .cont{text-align: center; position: absolute; left: 0; bottom: 178rpx; z-index: 1; width: 100%;
+        .tit{font-size: 28rpx; line-height: 40rpx; color: #fff;}
+        .num{color: #DFC183; font-size: 144rpx; line-height: 1; font-weight: bold; margin: 12rpx 0 20rpx;}
+        .tip{color: #fff; font-size: 28rpx; line-height: 40rpx; font-weight: bold;}
+    }
+}
+.sign-box{background-color: #fff; border-radius: 12rpx; position: absolute; left: 24rpx; margin-top: -148rpx; width: 702rpx; padding: 24rpx;
+    .tit{font-size: 36rpx; font-weight: 500; line-height: 50rpx;
+		.text{color: $xinxii-theme-color;padding: 0 8rpx;}
+	}
+    .time-box{display: flex; margin-top: 24rpx;
+        .item{text-align: center; width: 80rpx;height: 80rpx;margin-right: 16rpx;background: rgba(235, 237, 240, 0.4);border-radius: 6px;
+			&:last-child{margin-right: 0;
+		}
+        /deep/ &.act{background: rgba(50, 150, 250, 0.5); border-radius: 4rpx; color: #fff;
+                .icon,.week{color: #fff !important;}
+				>view{
+					&.newDay{background-color: transparent;}
+				}
+                // >view{background: rgba(50, 150, 250, 0.5) !important;}
+				// .newDay{background-color: rgba(50, 150, 250, 0.5); border-radius: 4rpx;}
+            }
+        /deep/ >view{width: 100%;height: 100%;position: relative;font-size: 0;
+                &.newDay{background-color: rgba(50, 150, 250, 0.5); border-radius: 4rpx;
+					.icon,.week{color: #fff !important;}
+				}
+				.icon-wrap{height: 48rpx;display: flex;align-items: center;justify-content: center;}
+                .week{font-size: 20rpx; line-height: 28rpx;color: #999999;position: absolute;width: 100%;left: 0;bottom: 8rpx;}
+                .date{color: #999; line-height: 34rpx; font-size: 24rpx; margin: 6rpx 0;}
+                image{width: 32rpx; height: 24rpx;
+                    &.start{width: 24rpx;}
+                }
+            }
+            
+        }
+    }
+}
+.btn-box{
+	.btn{width: 474rpx; height: 88rpx; margin: 48rpx auto 24rpx;font-size: 32rpx; border-radius: 4rpx; color: #fff; border-radius: 44rpx;background: linear-gradient(90deg, #71B6F9 0%, #3874F6 100%);display: flex;align-items: center;justify-content: center;
+	    &.end{background: #DDD;}
+	}
+}
+.info{margin: 240rpx 24rpx 0;background: #FFFFFF;border-radius: 6px;padding: 24rpx;
+    .tit-box{display: flex; align-items: center; justify-content: space-between;margin-bottom: 24rpx;
+        .title{display: flex; align-items: center;
+            .txt{font-size: 32rpx; text-align: center; color: $xinxii-theme-color;font-weight: 500;}
+        }
+        .line1{position: relative;
+            &::before{content: ''; width: 170rpx; height: 2rpx; background-color: $xinxii-theme-color; position: absolute; top: 50%; transform: translateY(-50%); right: 32rpx;}
+        }
+        .line2{position: relative;
+            &::after{content: ''; width: 170rpx; height: 2rpx; background-color: $xinxii-theme-color; position: absolute; top: 50%; transform: translateY(-50%); left: 32rpx;}
+        }
+        
+    }
+    .list{ font-size: 28rpx; color: #999; line-height: 44rpx;
+        .item{padding: 8rpx 0;
+			&:first-child{padding-top: 0;}
+			&:last-child{padding-bottom: 0;}
+		}
+    }
+}
+</style>

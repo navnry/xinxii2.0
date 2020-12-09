@@ -1,0 +1,198 @@
+<template>
+	<view class="item">
+		<text class="left-text" :style="{minWidth: minWidthNum}" v-if="leftText">{{leftText}}</text>
+		<slot name="left"></slot>
+		<view class="nation-code" v-if="showNationCode">
+			<text>+86</text>
+            <!-- <image lazy-load src="../../static/login_arrow.png" mode=""></image> -->
+            <x-icon color="#333" size="28" type="arrow-right"></x-icon>
+		</view>
+		<view class="input">
+			<input :type="inputType" :value="currentValue" placeholder-class="pld-class" :placeholder="placeholder" @input="inputload" :disabled="disabled" :password="isPassword" :maxlength="maxlength" :focus="focus" />
+		</view>
+		<view class="captcha" :class="{busy: captcha.busy}" @tap="verification" v-if="isCaptcha">
+			{{captcha.txt}}
+		</view>
+		<slot name="right"></slot>
+	</view>
+</template>
+<script>
+	import { checkPhone } from '@/common/utils'
+	export default {
+		props: {
+			minWidthNum: {
+				type: String,
+				default: ''
+			},
+			type: {
+				type: String,
+				default: 'text'
+			},
+			leftIcon: {
+				type: String,
+				default: ''
+			},
+			placeholder: {
+				type: String,
+				default: ''
+			},
+			value: {
+				type: [String, Number],
+				default: ''
+			},
+			disabled: {
+				type: [Boolean, String],
+				default: false
+			},
+			maxlength: {
+				type: [String, Number],
+				default: 140
+			},
+			focus: {
+				type: Boolean,
+				default: false
+			},
+			captchaMobile: {
+				type: String,
+				default: ''
+			},
+			captchaName: {
+				type: String,
+				default: ''
+			},
+			captchaType: {
+				type: [Number,String]
+			},
+			leftText: {
+				type: String,
+				default: ''
+			},
+			showNationCode: {
+				type: [Boolean,String],
+				default: false
+			}
+		},
+		computed: {
+			nationCode() {
+				return this.$store.state.nationCode
+			}
+		},
+		data() {
+			return {
+				currentValue: this.value,
+				inputType: this.type,
+				isCaptcha: false,
+				isPassword: false,
+				captcha: {
+					txt: '获取验证码',
+					cd: 60,
+					busy: false
+				}
+			} 
+		},
+		mounted() {
+			if (this.type === 'captcha') {
+				this.isCaptcha = true
+				this.inputType = 'text'
+			} else if (this.type === 'password') {
+				this.isPassword = true
+				this.inputType = 'text'
+			} else if (this.type === 'text') {
+			    this.isPassword = false
+			    this.inputType = 'text'
+			} else if (this.type === 'tel') {
+                this.inputType = 'number'
+            }
+		},
+		methods: {
+			inputload(event) {
+				let value = event.target.value
+				if (value) {
+					value = value.trim()
+				}
+                if(this.type === 'tel'){
+                    value = value.replace(/\D+/, '')
+                }
+				this.$emit('input', value)
+			},
+			setCurrentValue(value) {
+				if (value === this.currentValue) return
+				this.currentValue = value
+			},
+			verification() {
+				if (this.captcha.busy) return
+				if (!checkPhone(this.captchaMobile)&&this.captchaName=='') {
+                    this.showToast('请输入正确的手机号')
+					return
+				}
+				this.captcha.busy = true
+				this.captcha.txt = this.captcha.cd + 's重新获取'
+				let time = setInterval(() => {
+					this.captcha.cd--
+					this.captcha.txt = this.captcha.cd + 's重新获取'
+					if (this.captcha.cd <= 0) {
+						clearInterval(time)
+						this.captcha.busy = false
+						this.captcha.txt = '获取验证码'
+						this.captcha.cd = 60
+					}
+				}, 1000)
+				this.$api.post('verifyCode/verifyCode/encrypt/getCode.do', {
+					phone: this.captchaMobile,
+					type: this.captchaType
+				}).then( res => {
+					if (res.success) {
+						this.showToast('发送成功')
+					} else {
+						this.showToast('发送失败')
+						clearInterval(time)
+						this.captcha.busy = false
+						this.captcha.txt = '获取验证码'
+						this.captcha.cd = 60
+					}
+				})
+			}
+		},
+		watch: {
+			value (val) {
+				this.setCurrentValue(val);
+			},
+            type (val) {
+                if (val === 'captcha') {
+                    this.isCaptcha = true
+                    this.inputType = 'text'
+                } else if (val === 'password') {
+                    this.isPassword = true
+                    this.inputType = 'text'
+                } else if (val === 'text') {
+                    this.isPassword = false
+                    this.inputType = 'text'
+                } else if (val === 'tel') {
+                    this.inputType = 'number'
+                }
+            }
+		}
+	}
+</script>
+<style lang="scss" scoped>
+	.item {display: flex; align-items: center; height: 104rpx; line-height: 104rpx; border-bottom: 1rpx solid #DDD; position: relative;
+		.input { font-size: 32rpx; flex-grow: 1;
+			input { height: 56rpx; line-height: 56rpx; display: block; color: #333; font-size: 32rpx;}
+		}
+		.left-text { font-size: 32rpx; color: #333; margin-right: 30rpx; }
+	}
+
+	.captcha { min-width: 188rpx; height: 56rpx; text-align: center; line-height: 52rpx; border: 2rpx solid #979797; font-size: 28rpx; color: #333; text-align: center; border-radius: 28rpx;
+		&.busy {color: #FF5000;}
+	}
+
+	.nation-code {font-size: 28rpx;color: #333;
+        .icon{margin: 0 48rpx 0 24rpx;}
+	}
+</style>
+<style lang="scss">
+	.pld-class {
+		color: #999;
+		white-space: normal;
+	}
+</style>

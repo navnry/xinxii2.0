@@ -1,0 +1,79 @@
+<script>
+    import { getConigInfo, openUrl} from '@/common/api'
+    import {checkUpdateApp} from '@/common/utils'
+	export default {
+		onLaunch: function() {
+			console.log('App Launch')
+            // #ifdef APP-PLUS
+            setTimeout( () => {
+                plus.navigator.closeSplashscreen()
+            },3000)
+            // 检测更新app
+            checkUpdateApp(this)
+            // #endif
+           
+            let userinfo = uni.getStorageSync('userinfo')
+			console.log(userinfo);
+            if (userinfo) {
+                this.$store.commit('LOGIN', {userinfo})
+            }
+            let authinfo = uni.getStorageSync('authinfo')
+            if(authinfo){
+                this.$store.commit('WXLOGIN',{authinfo})
+            }
+            // let idInfoCache = uni.getStorageSync('idInfoCache')
+            // if(idInfoCache){
+            //     this.$store.commit('SET_IDINFO_CACHE',{idInfoCache})
+            // }
+            let statusBarHeight = uni.getSystemInfoSync().statusBarHeight
+            this.$store.commit('SET_STATUS_BAR_HEIGHT', statusBarHeight)
+            let configinfo = uni.getStorageSync('configinfo')
+            this.$store.commit('SET_CONFIGINFO', configinfo)
+            let configSuccess = false
+            getConigInfo(this, null, () => {
+                configSuccess = true
+            })
+            uni.onNetworkStatusChange((res) => {
+                if (res.isConnected && !configSuccess) {
+                    getConigInfo(this)
+                }
+            })
+            
+            
+		},
+		onShow: function() {
+			console.log('App Show')
+            // #ifdef APP-PLUS
+                //设置应用图标的数量
+                plus.runtime.setBadgeNumber(0)
+            // }
+            // #endif
+            this.$store.commit('SET_APP_STATUS', true)
+		},
+		onHide: function() {
+            // #ifdef APP-PLUS
+                plus.runtime.setBadgeNumber(0)
+            // #endif
+			console.log('App Hide')
+            this.$store.commit('SET_APP_STATUS', false)
+		}
+	}
+</script>
+
+<style>
+	view, text, button, navigator, scroll-view, label, textarea, image, input{padding: 0; margin: 0; box-sizing: border-box; font-family:PingFangSC-Regular,PingFang SC;}
+	.status_bar {height: var(--status-bar-height); width: 100%;}
+	button:after{border: none;}
+	page{background-color: #F6F7F8; color: #333;}
+    /* swiper样式修改 */
+    uni-swiper .uni-swiper-dot{width: 56rpx; height: 6rpx;}
+    uni-swiper .uni-swiper-dots-horizontal .uni-swiper-dot{ margin-right: 8rpx; border-radius: 0;}
+    .uni-picker-container .uni-picker-action.uni-picker-action-confirm{color: #FF5000 !important;}
+	/*每个页面公共css */
+	.mask{position: fixed; height: 100%; width: 100%; background-color: #000; opacity: .5; z-index: 89; left: 0; top: 0;}
+	
+	
+	ul,ol{margin: 0;padding: 0;list-style: none;}
+    .uni-swiper-slide-frame{width: 606rpx !important;}
+    .uni-swiper-slide-frame .swiper-item-box{position: absolute; left: 0;}
+</style>

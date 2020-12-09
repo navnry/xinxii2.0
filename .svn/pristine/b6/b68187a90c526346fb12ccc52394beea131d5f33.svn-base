@@ -1,0 +1,247 @@
+{
+    "name" : "禧小保",
+    "appid" : "__UNI__C1A130D",
+    "description" : "",
+    "versionName" : "1.0.3",
+    "versionCode" : 10030,
+    "transformPx" : false,
+    /* 5+App特有相关 */
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : false,
+            "waiting" : true,
+            "autoclose" : false,
+            "delay" : 0
+        },
+        /* 模块配置 */
+        "modules" : {
+            "Share" : {},
+            "OAuth" : {},
+            "Payment" : {}
+        },
+        /* 应用发布信息 */
+        "distribute" : {
+            /* android打包配置 */
+            "android" : {
+                "permissions" : [
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_CONTACTS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+                    "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_CONTACTS\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ],
+                "schemes" : "xinxii"
+            },
+            /* ios打包配置 */
+            "ios" : {
+                "capabilities" : {
+                    "entitlements" : {
+                        "com.apple.developer.associated-domains" : [ "applinks:www.xinxiichina.com" ]
+                    }
+                },
+                "idfa" : false,
+                "urltypes" : "xinxii"
+            },
+            /* SDK配置 */
+            "sdkConfigs" : {
+                "oauth" : {
+                    "weixin" : {
+                        "appid" : "wxf8136493cdec4618",
+                        "appsecret" : "fe55ed095673e6d3672ee81cbb2dda02",
+                        "UniversalLinks" : "https://www.xinxiichina.com/.well-known/"
+                    }
+                },
+                "payment" : {
+                    "weixin" : {
+                        "appid" : "wxf8136493cdec4618",
+                        "UniversalLinks" : "https://www.xinxiichina.com/.well-known/"
+                    },
+                    "alipay" : {}
+                },
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wxf8136493cdec4618",
+                        "UniversalLinks" : "https://www.xinxiichina.com/.well-known/"
+                    }
+                },
+                "ad" : {},
+                "push" : {}
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
+                }
+            },
+            "splashscreen" : {
+                "androidStyle" : "default",
+                "android" : {
+                    "hdpi" : "page_guide/static/guide/guide1.9.png",
+                    "xhdpi" : "page_guide/static/guide/guide2.9.png",
+                    "xxhdpi" : "page_guide/static/guide/guide3.9.png"
+                },
+                "iosStyle" : "storyboard",
+                "ios" : {
+                    "storyboard" : "page_assets/static/CustomStoryboard.zip"
+                }
+            }
+        },
+        "nativePlugins" : {
+            "JY-JPush" : {
+                "ios_appkey" : "3ad76dd419df531e44f5a27d",
+                "android_channel" : "android",
+                "android_appkey" : "3ad76dd419df531e44f5a27d",
+                "ios_channel" : "ios",
+                "__plugin_info__" : {
+                    "name" : "【限时5折】JYJPush极光推送插件 - 极光官方推荐",
+                    "description" : "极光推送Uni版本",
+                    "platforms" : "Android,iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=741",
+                    "android_package_name" : "com.xinxii.broker",
+                    "ios_bundle_id" : "com.xinxii.broker",
+                    "isCloud" : true,
+                    "bought" : 1,
+                    "pid" : "741",
+                    "parameters" : {
+                        "ios_appkey" : {
+                            "des" : "极光推送的APPKEY",
+                            "key" : "JPUSH_APPKEY",
+                            "value" : ""
+                        },
+                        "android_channel" : {
+                            "des" : "极光推送的渠道名称",
+                            "key" : "JPUSH_CHANNEL",
+                            "value" : ""
+                        },
+                        "android_appkey" : {
+                            "des" : "极光推送的APPKEY",
+                            "key" : "JPUSH_APPKEY",
+                            "value" : ""
+                        },
+                        "ios_channel" : {
+                            "des" : "极光推送的渠道名称",
+                            "key" : "JPUSH_CHANNEL",
+                            "value" : ""
+                        }
+                    }
+                }
+            },
+            "CL-UpDater" : {
+                "__plugin_info__" : {
+                    "name" : "app版本升级原生弹框和进度提示(包含wgt升级)",
+                    "description" : "app版本升级(包含热更新)弹框提示和进度显示，apk自动安装",
+                    "platforms" : "Android,iOS",
+                    "url" : "https://ext.dcloud.net.cn/plugin?id=1371",
+                    "android_package_name" : "com.xinxii.broker",
+                    "ios_bundle_id" : "com.xinxii.broker",
+                    "isCloud" : true,
+                    "bought" : 1,
+                    "pid" : "1371",
+                    "parameters" : {}
+                }
+            }
+        }
+    },
+    /* 快应用特有相关 */
+    "quickapp" : {},
+    /* 小程序特有相关 */
+    "mp-weixin" : {
+        "appid" : "wx6d8f1d5bd7eea6e8",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : false,
+            "minified" : true
+        },
+        "usingComponents" : true
+    },
+    "mp-alipay" : {
+        "usingComponents" : true,
+        "appid" : "2021001184662165"
+    },
+    "mp-baidu" : {
+        "usingComponents" : true
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true,
+        "appid" : "tt3eb54808a18f78ad"
+    },
+    "h5" : {
+        "router" : {
+            "mode" : "history",
+            "base" : "/broker"
+        },
+        "title" : "禧小保",
+        "devServer" : {
+            "https" : false,
+            "port" : 8081,
+            "disableHostCheck" : true,
+            "proxy" : {
+                "/api" : {
+                    // "target" : "http://106.52.249.164:8080/",
+                    "target" : "https://dev.xinxiichina.com/",
+                    // "target" : "http://localhost:8080",
+                    // "target" : "https://www.xinxiichina.com/",
+                    "changeOrigin" : true,
+                    "secure" : true,
+                    "pathRewrite" : {
+                        "^/api" : ""
+                    }
+                }
+            }
+        },
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : false
+            }
+        },
+        "domain" : "https://dev.xinxiichina.com/"
+    }
+}

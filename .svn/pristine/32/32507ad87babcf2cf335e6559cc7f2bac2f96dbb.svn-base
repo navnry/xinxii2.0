@@ -1,0 +1,44 @@
+<template>
+  <view class="binding">
+  	<x-nav-bar :no-border="true" title="禧小保"></x-nav-bar>
+    <view class="box">
+        <view class="group">
+            <image lazy-load src="./static/register_success.png"></image>
+            <view class="tip">注册成功</view>
+            <view class="btn" @click="dowload">下载禧小保APP</view>
+        </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import { checkPhone } from '@/common/utils/index.js'
+import { mapState, mapMutations } from 'vuex'
+export default {
+    data() {
+        return {
+            
+        }
+    },
+    onLoad() {
+        
+    },
+    methods: {
+       dowload(){
+            if (uni.getSystemInfoSync().platform === 'ios') {
+                this.openUrl('https://apps.apple.com/cn/app/%E7%A6%A7%E5%B0%8F%E4%BF%9D/id1531454953')
+            } else {
+                this.openUrl('https://sj.qq.com/myapp/detail.htm?apkName=com.xinxii.broker')
+            }
+       }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+	.binding{width: 100%; background: url('./static/register_bg.png') no-repeat; background-size: 100% 100%; height: 100vh; font-size: 32rpx;}
+    .group{width: 702rpx; height: 504rpx; background: #fff; border-radius: 12rpx; margin: 384rpx 24rpx 0; padding: 72rpx 48rpx; display: inline-block; text-align: center; font-size: 0;}
+    .group image{width: 84rpx; height: 84rpx;}
+    .group .tip{font-size: 32rpx; color: #333; margin: 24rpx 0 120rpx; font-weight: bold;}
+    .btn{border-radius: 4rpx; height: 88rpx; background: #ff5000; text-align: center; line-height: 88rpx; color: #fff; font-size: 32rpx;}
+</style>

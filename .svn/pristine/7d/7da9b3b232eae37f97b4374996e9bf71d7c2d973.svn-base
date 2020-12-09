@@ -1,0 +1,397 @@
+<template>
+    <view class="content">
+        <x-nav-bar :noBorder="true" title="我的邀请"></x-nav-bar>
+        <view class="tab-list">
+            <view class="tab-item" :class="{act: current == 1}" @click="selTab(1)">邀请二维码</view>
+            <view class="tab-item" :class="{act: current == 2}" @click="selTab(2)">推荐详情</view>
+        </view>
+        <x-level-picker ref="firmPicker"
+            v-model="firmVlaue"
+            mode="selector"
+            cancel-text="取消"
+            confirm-text="确定"
+            cancel-color="#999"
+            confirm-color="#FF5000"
+            :list="firmList"
+            @confirm="handleConfirmFirm"
+        ></x-level-picker>
+        <view class="" v-show="current == 1">
+            <view class="center">
+                <image lazy-load class="center-bg" src="../../static/invite_bg.png" mode=""></image>
+                <view>
+                    <view class="btn-firm" v-if="!firm" @click="selFirm">设置好友加入的分公司</view>
+                    <view class="tit">邀请好友获得推广费</view>
+                    <view class="code-box">
+                        <view class="head-box">
+                            <image lazy-load :src="userinfo.logo" mode="aspectFill"></image>
+                            <view class="name">{{userinfo.fullname}}</view>
+                        </view>
+                        <view class="code-img">
+                            <image lazy-load :src="code?code:'../../static/code.png'" mode=""></image>
+                            <view v-if="!firm" class="mask"></view>
+                        </view>
+                        <view class="tip" v-if="firm"  @click="selFirm">
+                            <view>
+                                <text>邀请加入</text> <text class="name">{{firm}}</text><image lazy-load src="../../static/invite_arrow.png" mode=""></image>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            <view class="info">
+                <view class="top">二维码使用说明：</view>
+                <view>1、扫码即表示愿意接受邀请，成为禧小保认证用户，与推荐人成为邀请关系。</view>
+                <view>咨询内容包含但不限于以下内容：</view>
+                <view>·禧小保可销售产品讲解；</view>
+                <view>·展业线索跟踪;</view>
+                <view>·APP其他功能介绍</view>
+                <view>2、其他使用方式。</view>
+            </view>
+            <view class="footer">
+                <view class="item item1" @click="shareLink">
+                    <view>
+                        <!-- <image lazy-load src="../../static/invite_share_link.png" mode=""></image> -->
+                        <x-icon type="share1"></x-icon>
+                        <view>分享链接</view>
+                    </view>
+                </view>
+                <view class="item item2" @click="createImg">
+                    <view>
+                        <!-- <image lazy-load src="../../static/invite_dowload.png" mode=""></image> -->
+                        <x-icon type="download"></x-icon>
+                        <view>生成美图</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="" v-show="current == 2">
+            <view class="list" v-if="inviteList.length>0">
+                <view class="item" v-for="(item,index) in inviteList" :key="index">
+                    <view class="left">
+                        <view class="phone">{{item.phone|formatPhone}}</view>
+                        <view class="name">{{item.fullname||'未实名'}}</view>
+                    </view>
+                    <view class="right">
+                        <view class="status">{{item.isDistributor == 1 ? '签约经纪人' : '普通用户'}}</view>
+                        <!-- <image lazy-load src="../../static/arrow_right2.png" mode=""></image> -->
+                    </view>
+                </view>
+                <x-load-more :status="pageStatus"></x-load-more>
+            </view>
+            <x-no-data v-else-if="inviteList.length==0&&noData"></x-no-data>
+        </view>
+        <view class="hideCanvasView">
+            <canvas class="hideCanvas" canvas-id="default_PosterCanvasId" :style="{width: (poster.width||0) + 'px', height: (poster.height||0) + 'px'}"></canvas>
+        </view>
+    </view>
+</template>
+
+<script>
+    import _app from '@/common/lib/QS-SharePoster/app.js'
+    import getSharePoster from '@/common/lib/QS-SharePoster/QS-SharePoster.js'
+    import { mapState } from 'vuex'
+    import {formatPhone} from '@/common/utils'
+    export default{
+        data () {
+            return {
+                current: 1,
+                firm: '',
+                firmVlaue: '',
+                firmList:[],
+                inviteList: [],
+                sendData:{
+                    pageSize: 20,
+                    pageNo:1
+                },
+                noData: false,
+                pageStatus: 'more',
+                code: '',
+                id: '',
+                poster: {
+                    finalPath: ''
+                },
+                qrShow: false,
+                canvasId: 'default_PosterCanvasId',
+                backgroundImage: 'https://xinxii-1302479696.cos.ap-guangzhou.myqcloud.com/qrcode_local/invite_code.png',
+                promoteUrlImg: '',
+				userLogo:''
+            }
+        },
+        computed:mapState(['userinfo']),
+        onLoad() {
+            this.getFirm()
+			this.userLogo = this.userinfo.logo + '?imageMogr2/crop/300x300/gravity/center'
+        },
+        filters:{
+            formatPhone
+        },
+        methods:{
+            selTab(val){
+                if(this.current == val) return
+                this.current = val
+                if(val == 1) return
+                this.sendData.pageNo = 1
+                this.getInviteDetail()
+            },
+            getInviteDetail(){
+                this.$api.get('distributor/relation/getBrokerDisList.do',{params:this.sendData}).then( res => {
+                    this.noData = true
+                    if(res.success){
+                        if (this.sendData.pageNo <= 1) {
+                        	this.inviteList = res.data
+                        } else {
+                        	this.inviteList.push(...res.data)
+                        }
+                        this.sendData.pageNo++
+                        if (this.sendData.pageNo > Math.ceil(res.page.totalCount / this.sendData.pageSize)) {
+                        	this.pageStatus = 'noMore'
+                        }else{
+                        	this.pageStatus = 'more'
+                        }
+                    }
+                })
+            },
+            selFirm(){
+                this.$refs.firmPicker.show()
+            },
+            getFirm(){
+                this.$api.post('member/qualification/dictData.do').then( res => {
+                    if(res.success){
+                		this.firmList = res.data.BranchOffice
+                    }
+                })
+            },
+            handleConfirmFirm(item){
+                this.firm = item.item.label
+                this.getCode(item.item.value)
+            },
+            getCode(branchId){
+                this.$api.get('distributor/relation/getBranchQRCode.do',{params:{branchId}}).then( res => {
+                    if(res.success){
+                        this.code = res.data.qrCodePath
+                        this.promoteUrlImg = res.data.qrCodePath
+                        // this.backgroundImage = ''
+                        
+                        this.id = res.data.disWithBranchId
+                    }
+                })
+            },
+            shareLink(){
+                if(!this.firm){
+                    this.showToast('请选择好友加入的分公司')
+                    return
+                }
+                let url = `https://www.xinxiichina.com/broker/pages/my/register?disWithBranchId=${this.id}`
+                this.copy(url)
+                this.showToast('复制成功，立马分享给好友吧')
+            },
+            createImg(){
+                if(!this.firm){
+                    this.showToast('请选择好友加入的分公司')
+                    return
+                }
+                this.shareFc()
+            },
+            async shareFc() {
+                try {
+                    if (!this.poster.finalPath) {
+                        const d = await getSharePoster({
+                            type: 'testShareType',
+                            backgroundImage: this.backgroundImage,
+                            posterCanvasId: this.canvasId,
+                            imagesArray: ({
+                                bgObj,
+                                type,
+                                bgScale
+                            }) => { //接收的第一个参数为背景图片的信息, 第二个参数是自定义标识（感觉这里用不到）, 图片为示例图片
+                                return [
+                                    {
+                                        url: this.promoteUrlImg,
+                                        dx: bgObj.width * 0.3,
+                                        dy: bgObj.height * 0.37,
+                                        infoCallBack(imageInfo) {
+                                            let scale = bgObj.width * 0.4 / imageInfo.height
+                                            return {
+                                                dWidth: imageInfo.width * scale, // 因为设置了圆形图片 所以要乘以2
+                                                dHeight: bgObj.width * 0.4,
+                                            }
+                                        }
+                                    },
+                                    {
+                                        url: this.userLogo,
+                                        dx: bgObj.width * 0.31,
+                                        dy: bgObj.height * 0.29,
+                                        
+                                        infoCallBack(imageInfo) {
+											let scale,
+												dWidth,
+												dHeight
+											console.log(imageInfo.width,imageInfo.height)
+											if(imageInfo.width > imageInfo.height){
+												scale = bgObj.width * 0.1 / imageInfo.height
+												dWidth = imageInfo.width * scale
+												dHeight = bgObj.width * 0.1
+											}else{
+												scale = bgObj.width * 0.1 / imageInfo.width
+												dWidth = bgObj.width * 0.1
+												dHeight = imageInfo.width * scale
+											}
+                                            
+                                            return {
+                                                circleSet: {
+                                                    r: bgObj.width * 0.1 / 2
+                                                },
+                                                dWidth:dWidth, // 因为设置了圆形图片 所以要乘以2
+                                                dHeight: dHeight,
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            textArray: ({
+                                bgObj,
+                                type,
+                                bgScale
+                            }) => {
+                                const fontSize = bgObj.width * 0.05;
+                                const fontSize1 = bgObj.width * 0.036;
+                                const lineHeight = bgObj.height * 0.04;
+                                return [
+                                    {
+                                        fontWeight: '600',
+                                        text: this.userinfo.fullname,
+                                        size: fontSize,
+                                        color: '#333',
+                                        textAlign: 'left',
+                                        textBaseline: 'middle',
+                                        infoCallBack(textLength) {
+                                            // _app.log('index页面的text的infocallback ，textlength:' + textLength);
+                                            return {
+                                                dx: bgObj.width * 0.46,
+                                                dy: bgObj.height * 0.3
+                                            }
+                                        }
+                                    },
+                                    {
+                                        text: '邀请你加入禧小保',
+                                        size: fontSize1,
+                                        color: '#333',
+                                        textAlign: 'left',
+                                        textBaseline: 'middle',
+                                        infoCallBack(textLength) {
+                                            // _app.log('index页面的text的infocallback ，textlength:' + textLength);
+                                            return {
+                                                dx: bgObj.width * 0.46,
+                                                dy: bgObj.height * 0.33
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            setCanvasWH: ({
+                                bgObj,
+                                type,
+                                bgScale
+                            }) => { // 为动态设置画布宽高的方法，
+                                this.poster = bgObj;
+                            },
+                        });
+                        // this.poster.finalPath = d.poster.tempFilePath
+                        uni.showLoading({title:'下载中'})
+                        uni.saveImageToPhotosAlbum({
+                            filePath: d.poster.tempFilePath,
+                            success: () => {
+                                uni.hideLoading()
+                                this.showToast('保存成功')
+                            },
+                            fail: () => {
+                                uni.hideLoading()
+                                this.showToast('保存失败，请稍后重试')
+                            }
+                        })
+                        console.log(this.poster)
+                    }
+                    this.qrShow = true;
+                } catch (e) {
+                    _app.hideLoading();
+                    _app.showToast(JSON.stringify(e));
+                    console.log(JSON.stringify(e));
+                }
+            }
+        },
+        onReachBottom() {
+            if(this.pageStatus != 'more' && this.current == 2) return
+        	this.pageStatus = 'loading'
+            this.getInviteDetail()
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.hideCanvasView {position: relative;
+    .hideCanvas { position: fixed; top: -99999upx; left: -99999upx; z-index: -99999; }
+}
+.content{position: absolute; width: 100%; min-height: 100%; padding-bottom: 140rpx;
+    .tab-list{display: flex; align-items: center;
+        .tab-item{width: 50%; text-align: center; height: 88rpx; background-color: #fff; line-height: 88rpx; font-size: 32rpx;
+            &.act{color: #FF5000; position: relative;
+                &::after{content: ''; width: 162rpx; height: 4rpx; background-color: #ff5000; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);}
+            }
+        }
+    }
+    .center{width: 654rpx; margin: 120rpx auto 0; position: relative;
+        .center-bg{width: 100%; height: 100%; position: absolute; left: 0; top: 0; z-index: 1;}
+        >view{position: relative; z-index: 2; padding-bottom: 48rpx;
+            .btn-firm{width: 368rpx; height: 80rpx; line-height: 80rpx; text-align: center; background: #FF5000; color: #fff; font-size: 32rpx; border-radius: 44rpx; position: absolute; left: 50%; top: 356rpx;transform: translateX(-50%); z-index: 1000;}
+            .tit{text-align: center; color: #fff; font-size: 28rpx; line-height: 34rpx; padding-top: 10rpx;}
+            .code-box{text-align: center; margin-top: 46rpx;
+                .head-box{ font-size: 0;
+                    image{width: 80rpx; height: 80rpx; border-radius: 50%;}
+                    .name{font-size: 32rpx; line-height: 44rpx; margin: 12rpx 0 24rpx;}
+                }
+                .code-img{font-size: 0; position: relative;
+                    .mask{width: 100%; height: 100%; position: absolute; background: #fff; opacity: .8;}
+                    image{width: 310rpx; height: 314rpx;}
+                }
+                .tip{display: flex; align-items: center; justify-content: center; margin-top: 24rpx;
+                    >view{display: flex; align-items: center; font-size: 28rpx; line-height: 34rpx;
+                        image{width: 14rpx; height: 22rpx; margin-left: 6rpx;}
+                        .name{color: #FF5000; margin-left: 8rpx;}
+                    }
+                }
+            }
+        }
+    }
+    .info{position: relative; z-index: 1; padding: 0 92rpx 0 48rpx; font-size: 24rpx; line-height: 36rpx;
+        .top{font-size: 32rpx; line-height: 44rpx; margin: 48rpx 0 12rpx;}
+    }
+    .list{width: 702rpx; margin: 24rpx; background-color: #fff; border-radius: 12rpx; padding: 0 24rpx;
+        .item{display: flex; align-items: center; justify-content: space-between; font-size: 32rpx; height: 88rpx; border-bottom: 2rpx solid #F0F0F0;
+            &:last-of-type{border: none;}
+            .left,.right{display: flex; align-items: center;}
+            .left{
+                .name{color: #999; margin-left: 24rpx;}
+            }
+            .right{
+                .status{
+                    &.lv{color: #ff5000;}
+                }
+                image{width: 14rpx; height: 24rpx; margin-left: 12rpx;}
+            }
+        }
+    }
+    .footer{position: fixed; bottom: 0; left: 0; width: 100%; height: 112rpx; display: flex; background: #fff; z-index: 1;
+        .item{width: 50%; font-size: 0; text-align: center;
+            >view{font-size: 24rpx; height: 112rpx; padding: 14rpx 0;}
+        }
+        .item1{
+            image{width: 32rpx; height: 44rpx;}
+        }
+        .item2{
+            image{width: 44rpx; height: 44rpx;}
+        }
+    }
+}
+
+
+</style>

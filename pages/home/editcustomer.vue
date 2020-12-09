@@ -1,0 +1,142 @@
+<template>
+    <view class="content">
+        <x-nav-bar :no-border="true" title="编辑客户信息"></x-nav-bar>
+  <!--      <view class="top">
+            <view class="left">
+                <image lazy-load src="../../static/message/msg_order.png" mode=""></image>
+                <view class="info">
+                    <view class="name">{{detail.name}}</view>
+                    <view class="phone">{{detail.mobile}}</view>
+                </view>
+            </view>
+        </view> -->
+		<view class="group">
+		    <x-input minWidthNum="152rpx" leftText="姓名" placeholder="请输入姓名(必填)" v-model="customerObj.name"></x-input>
+		    <view class="list-item">
+		        <view class="left">性别</view>
+		        <view class="sex-box">
+		            <view :class="{act: customerObj.sex==0}" @click="selSex(0)">男</view>
+		            <view :class="{act: customerObj.sex==1}" @click="selSex(1)">女</view>
+		        </view>
+		    </view>
+		    <x-input type="tel" minWidthNum="152rpx" leftText="年龄" placeholder="请输入年龄(非必填)" v-model="customerObj.age"></x-input>
+		    <x-input type="tel" minWidthNum="152rpx" maxlength="11" leftText="手机号码" placeholder="请输入手机号码(必填)" v-model="customerObj.mobile"></x-input>
+		    <x-input type="text" minWidthNum="152rpx" maxlength="18" leftText="身份证号" placeholder="请输入身份证号(非必填)" v-model="customerObj.identity"></x-input>
+		    <x-input class="last-item" minWidthNum="152rpx" leftText="备注" placeholder="请输入" v-model="customerObj.remake"></x-input>
+		</view>
+		<button class="btn" type="default" @click="updateInfo">保存</button>
+		<x-modal ref="modal" title="提示" content="确定要删除该信息吗" @sure="deleteInfo"></x-modal>
+	</view>
+</template>
+
+<script>
+	import { IdentityCodeValid } from '@/common/utils'
+    export default{
+        data () {
+            return {
+				id:'',
+                detail: {},
+				customerObj: {
+				    name: '',
+				    sex: 0,
+				    age: '',
+				    mobile: '',
+				    identity: '',
+				    remake: '',
+				    proxyId: ''
+				}
+            }
+        },
+        onLoad(option) {
+            if(option.id){
+				this.id = option.id
+                this.getDetail(option.id)
+            }
+        },
+        methods:{
+			selSex(val){
+				if(this.customerObj.sex == val) return
+				this.customerObj.sex = val
+			},
+            getDetail(id){
+                this.$api.get('member/customer/getCustomerByCustomerId.do?customerId='+id).then( res => {
+                    if(res.success){
+                        this.detail = res.data
+						this.customerObj = this.detail
+                    }
+                })
+            },
+			showModal(){
+				this.$refs.modal.open()
+			},
+			deleteInfo(){
+				
+			},
+			updateInfo () {
+			    console.log(this.customerObj)
+			    if (!this.customerObj.name) {
+			    	this.showToast('请输入姓名')
+			    	return
+			    }
+			    let nameReg = /^[\u4e00-\u9fa5_a-zA-Z]+$/ 
+			    if(!nameReg.test(this.customerObj.name)){
+			        this.showToast('姓名仅支持中文或英文')
+			        return
+			    }
+			    this.customerObj.mobile = this.customerObj.mobile.trim()
+			    if (!this.customerObj.mobile) {
+			    	this.showToast('请输入手机号码')
+			    	return
+			    }
+			    if(!(/^1[3456789]\d{9}$/.test(this.customerObj.mobile))){ 
+			        this.showToast("请输入正确电话号码") 
+			        return 
+			    }
+			    this.$api.post('member/customer/update.do', this.customerObj).then( res => {
+			        if(res.success){
+			            this.showToast('修改成功！')
+			            setTimeout(()=>{
+			                this.backPage()
+			            },1500)
+			        }
+			    })
+			}
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.content{
+    .top{width: 702rpx; height: 176rpx; background:linear-gradient(137deg,rgba(254,88,45,1) 0%,rgba(255,148,78,1) 100%); border-radius: 12rpx; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24rpx;
+        .left{display: flex; align-items: center; font-size: 0;
+            image{width: 88rpx; height: 88rpx; border-radius: 50%; margin-right: 24rpx;}
+            .info{color: #fff;
+                .name{font-size: 32rpx; line-height: 44rpx; font-weight: bold;}
+                .phone{font-size: 24rpx; line-height: 34rpx; margin-top: 10rpx;}
+            }
+        }
+        .btn{width: 160rpx; height: 56rpx; line-height: 56rpx; background: #fff; color: #ff5000; font-size: 28rpx; border-radius: 28rpx;}
+    }
+    // .group{width: 702rpx; margin: 18rpx auto 0; background: #fff; border-radius: 12rpx; padding: 0 24rpx;
+    //     .tit{font-size: 32rpx; line-height: 44rpx; font-weight: bold; padding-top: 24rpx;}
+    //     .list{
+    //         .item{height: 86rpx; border-bottom: 1px solid #F0F0F0; display: flex; align-items: center; font-size: 28rpx;
+    //             &:last-of-type{border: none;}
+    //             .left{min-width: 112rpx; margin-right: 40rpx;}
+    //         }
+    //     }
+    // }
+	.group{width: 702rpx; margin: 24rpx auto 0; background-color: #fff; border-radius: 12rpx; padding: 0 24rpx;
+	   .last-item{border: none;}
+	   .list-item{display: flex; align-items: center; height: 104rpx; line-height: 104rpx; border-bottom: 1rpx solid #DDD;
+	       .left{font-size: 32rpx; width: 152rpx; margin-right: 30rpx;}
+	       .sex-box{display: flex; align-items: center;
+	           view{width: 102rpx; height: 48rpx; line-height: 44rpx; text-align: center; border: 2rpx solid #999; border-radius: 30rpx; margin-right: 24rpx; font-size: 32rpx; color: #999;
+	               &.act{border-color: $xinxii-theme-color; color: $xinxii-theme-color;}
+	           }
+	       }
+	   }
+	}
+	.btn{margin:48rpx 24rpx 0;width: 702rpx;line-height: 88rpx;background: $xinxii-theme-color;border-radius: 8rpx;font-size: 32rpx;color: #FFFFFF;}
+}
+</style>

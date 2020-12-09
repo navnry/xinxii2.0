@@ -1,0 +1,147 @@
+<template>
+    <view class="content">
+        <x-nav-bar :no-border="true" title="我的订单"></x-nav-bar>
+        <view class="tab-list">
+            <view class="tab-item" :class="{act: current == 0}" @click="selTab(0)">全部</view>
+            <view class="tab-item" :class="{act: current == 1}" @click="selTab(1)">待支付</view>
+            <view class="tab-item" :class="{act: current == 2}" @click="selTab(2)">已支付</view>
+            <view class="tab-item" :class="{act: current == 3}" @click="selTab(3)">保障中</view>
+            <view class="tab-item" :class="{act: current == 4}" @click="selTab(4)">待续保</view>
+        </view>
+        <view class="list" v-if="list.length>0">
+           <view class="list-item" v-for="item in list" :key="item.id">
+                <view class="status">
+                    <view class="time">生效时间：{{formatTime(item.effectDate)}}</view>
+                    <view v-if="true" class="txt">{{item.status}}</view>
+                    <view v-else class="txt await">sdf</view>
+                </view>
+                <view class="info">
+                    <view class="title">{{item.productName}}</view>
+                    <view class="detail">
+                        <view class="txt">被保人：{{item.serialNumber}}</view>
+                        <view class="txt">保障期限：{{item.insuredName}}</view>
+                        <view class="txt">投保单号：{{item.serialNumber}}</view>
+                        <view class="txt">保费：¥ {{!item.initialPrem ? '0.00' : parseFloat(item.initialPrem).toFixed(2)}}</view>
+                    </view>
+                    <image src="@/static/order/await-pay.png" mode=""></image>
+                    <image src="@/static/order/await-renewal.png" mode=""></image>
+                    <image src="@/static/order/security.png" mode=""></image>
+                    <image src="@/static/order/yet-pay.png" mode=""></image>
+                </view>
+                <view class="btn-box">
+                    <view></view>
+                    <view class="btn" @click="openUrl('./orderdetail?id='+item.serialNumber)">查看详情</view>
+                </view>
+            </view>
+            <x-load-more :status="pageStatus"></x-load-more>
+        </view>
+        <x-no-data num="2" v-else-if="list.length==0&&noData"></x-no-data>
+    </view>
+</template>
+
+<script>
+    export default{
+        data () {
+            return {
+                sendData:{
+                    date: '',
+                    pageNo: 1,
+                    pageSize: 10
+                },
+                list: [],
+                pageStatus: 'more',
+                noData: false,
+                current: 0
+            }
+        },
+        onShow() {
+            let year = new Date().getFullYear()
+            let month = new Date().getMonth() + 1
+            if(month< 10) {
+                month = '0' + month
+            }
+            this.sendData.date = year + '-' + month
+            this.getList()
+        },
+		onLoad(option) {
+			if(!option.current) return
+			this.current = option.current
+		},
+        methods:{
+            selTab(val){
+                if(val == this.current) return
+                this.current = val
+            },
+			add0(m){
+				return m < 10 ? '0' + m : m
+			},
+			formatTime(timestamp) {
+				if(!timestamp) return
+				var date = new Date(timestamp);
+				var Y = date.getFullYear() + '-';
+				var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+				var D = date.getDate() + ' ';
+				var H = date.getHours();
+				var MM = date.getMinutes();
+				return Y + M + D + this.add0(H) +':' + this.add0(MM);
+			},
+            getList(){
+                this.$api.get('insure/order/list.do',{params:this.sendData}).then( res => {
+                    this.noData = true
+					console.log(res.data)
+                    if(res.success){
+                        if (this.sendData.pageNo <= 1) {
+                        	this.list = res.data
+                        } else {
+                        	this.list.push(...res.data)
+                        }
+                        this.sendData.pageNo++
+                        if (this.sendData.pageNo > Math.ceil(res.page.totalCount / this.sendData.pageSize)) {
+                        	this.pageStatus = 'noMore'
+                        }else{
+                        	this.pageStatus = 'more'
+                        }
+                    }
+                })
+            }
+        },
+        onReachBottom() {
+            if(this.pageStatus != 'more') return
+        	this.pageStatus = 'loading'
+            this.getList()
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.content{
+    .tab-list{display: flex; align-items: center;  background-color: #fff;
+        .tab-item{width: 20%; text-align: center; color: #191F25; font-size: 30rpx; height: 96rpx; line-height: 96rpx;
+            &.act{color: $xinxii-theme-color; position: relative;
+                &::after{position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); content:''; width: 64rpx; height: 4rpx; background-color: $xinxii-theme-color;}
+            }
+        }
+    }
+    .list{ padding: 24rpx;
+        .list-item{width: 702rpx; background: #fff; border-radius: 12rpx; padding: 0 24rpx; margin-bottom: 24rpx;
+            .status{display: flex; align-items: center; justify-content: space-between; font-size: 28rpx; line-height: 40rpx; padding: 24rpx 0; border-bottom: 1px solid #F0F0F0;
+                .time{color: #999;}
+                .txt{color: $xinxii-theme-color;
+                    &.await{color: #EF4034;}
+                }
+            }
+            .info{padding: 24rpx 0; border-bottom: 1px solid $xinxii-border-color; position: relative;
+                .title{font-size: 0; display: flex; align-items: center; margin-bottom: 12rpx;font-size: 32rpx; font-weight: bold; line-height: 44rpx;}
+                .detail{font-size: 28rpx; line-height: 40rpx; color: #999;}
+                image{width: 168rpx; height: 168rpx; position: absolute; right: 0; bottom: 8rpx;}
+            }
+            .btn-box{display: flex; align-items: center; justify-content: space-between; padding: 24rpx 0;
+                .btn{width: 144rpx; height: 56rpx; line-height: 52rpx; border: 2rpx solid $xinxii-theme-color; color: $xinxii-theme-color; font-size: 28rpx; text-align: center; border-radius: 6rpx;}
+            }
+            
+        }
+        
+    }
+}
+    
+</style>

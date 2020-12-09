@@ -1,0 +1,128 @@
+<template>
+    <view class="content">
+        <view class="cont" v-if="articleData">
+            <view class="tit">{{articleData.title}}</view>
+            <view class="time">{{articleData.channelName}} {{creadTime(articleData.createDate)}}</view>
+            <x-rich-text :html="articleData.content"></x-rich-text>
+        </view>
+        <view class="list">
+            <view class="line"></view>
+            <view class="group">
+                <view class="item" v-for="item in articleList" :key="item.id" @click="seeDetail(item)">·{{item.title}}</view>
+            </view>
+            <view class="tip">资讯内容不构成投资建议，投资者应独立决策并自行承担风险。</view>
+        </view>
+		<!-- #ifndef H5 -->
+		<view class="seat" style="height: 88rpx;"></view>
+		<view class="share-btn">
+			<button @click="share">分享文章</button>
+		</view>
+		<!-- #endif -->
+        <b-share-wechat :url="url" :title="articleData.title" :articleId="id" :imageUrl="articleData.pic+'?imageMogr2/thumbnail/200x200'" :summary="articleData.subTitle" typeNumber=0 :show="show" @click="show = false"></b-share-wechat>
+		<!-- <x-modal ref="modal" title="您还未登录" content="是否立即去登录？" @sure="sure"></x-modal> -->
+    </view>
+</template>
+
+<script>
+    import constVal from '../../common/utils/constval.js'
+    import { lastDateTime } from '@/common/utils'
+    import { mapState } from 'vuex'
+    export default {
+        data () {
+            return {
+                id: '',
+                articleData: '',
+                articleList: [],
+                show: false,
+                url: '',
+                imageUrl: '',
+                summary: ''
+            }
+        },
+        onShow() {
+            this.show = false
+        },
+        onLoad(option) {
+            if(option.id){
+                this.id = option.id
+                this.getDetail()
+                this.getHolList()
+            }
+        },
+        computed:{
+            ...mapState(['isLogin']),
+            creadTime(){
+                return (time) => {
+                    let t = time.replace(/-/g, '/')
+                    return lastDateTime(new Date(t).getTime())
+                }
+            }
+        },
+        methods:{
+			sure(){
+				 this.openUrl('../my/login')
+			},
+            getDetail(){
+                this.$api.get('article/article/getDetails.do',{params:{id:this.id}}).then(res =>{
+                	if(res.success){
+                		this.articleData = res.data
+						uni.pageScrollTo({
+						    scrollTop: 0,
+						    duration: 0,
+							selector:".content"
+						});
+                	}
+                })
+            },
+            getHolList(){
+                this.$api.get('article/article/getHotsWithoutId.do',{params:{id:this.id}}).then(res =>{
+                	if(res.success){
+                		this.articleList = res.data
+                	}
+                })
+            },
+            seeDetail(item){
+                this.id = item.id
+                this.getDetail()
+                this.getHolList()
+            },
+            share(){
+     //            console.log(this.isLogin);
+     //            if(!this.isLogin){
+     //                // this.showModel('您还未登录','是否立即去登录？',()=>{
+     //                //     this.openUrl('./login')
+     //                // })
+					// this.$refs.modal.open()
+     //                return
+     //            }
+                this.show = true
+                this.url = constVal.UPLOAD_IMG_URL + 'broker/pages/train/detail?id='+ this.id
+            },
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .top-right{font-size: 0; display: flex; align-items: center; justify-content: center; width: 100%;
+        image{width: 40rpx; height: 40rpx;}
+    }
+    .cont{background-color: #fff;
+        .tit{ font-size: 40rpx; font-weight: bold; line-height: 56rpx; padding: 24rpx;}
+        .time{color: #999; font-size: 24rpx; padding: 0 24rpx; margin-bottom: 24rpx;}
+		
+    }
+    .list{padding: 50rpx 24rpx;
+        .line{border-top: 1px dashed #999; padding-top: 48rpx;}
+        .group{background: #fff; border-radius: 4rpx; padding: 0 24rpx;
+            .item{padding: 24rpx 0; color: #666; font-size: 28rpx; line-height: 42rpx; border-bottom: 1px solid #F0F0F0;
+                &:last-of-type{border: none;}
+            }
+        }
+        .tip{margin: 48rpx auto 0; width: 456rpx; text-align: center; font-size: 28rpx; color: #666; line-height: 42rpx;}
+    }
+/deep/	table{width: 100%;border-collapse: collapse;}
+
+	.share-btn{position: fixed;width: 100%;left: 0;bottom: 0;
+		button{width: 100%;height: 88rpx;background: #FFFFFF;font-size: 32rpx;line-height: 88rpx;color: $xinxii-theme-color;}
+	}
+</style>

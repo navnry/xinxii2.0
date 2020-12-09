@@ -1,0 +1,389 @@
+<template>
+    <view class="content">
+        <x-nav-bar leftWidth="24rpx" noBlank="true" :backgroundColor="toBgColor" rightWidth="24rpx" :noBorder="true" leftIcon="none" title=" ">
+            <view class="head">
+                <view class="search-box">
+                    <input type="text" :style="{background:topColor,width:topWidth+'rpx'}" disabled="disabled" @click="openUrl('./searchreslut')" placeholder="搜索" placeholder-class="input-pld">
+                    <x-icon class="img-search" type="search" size="36" color="#999"></x-icon>
+                </view>
+                <x-icon v-if="!isWx" class="service-icon" type="service" :color="topColor"></x-icon>
+                <x-icon v-if="!isWx" type="msg" :color="topColor"></x-icon>
+            </view>
+        </x-nav-bar>
+       <x-refresh
+        @refresh = 'refresh' 
+        :isImg = 'refreshImg'
+        :pullHeight = '50' 
+        :maxHeight = '50' 
+        :isTab = 'false' 
+        ref = 'xRefresh'>
+         <!-- 插入自己的数据-->
+            <view class="top-bg">
+                <image class="top-bg-img" src="../../static/home_top_bg.png" mode=""></image>
+            </view>
+        	<view class="group">
+        	    <view class="item" v-for="item in groupData" :key="item.id" @click="toUrl(item.url,item.id)">
+        	        <image lazy-load :src="item.src" mode=""></image>
+        	        <view class="txt">{{item.txt}}</view>
+        	    </view>
+        	</view>
+            <view class="insurance">
+                <view class="top-list">
+                    <view class="top-list-item" :class="{act: current == 0}" @click="selType(0)">成人</view>
+                    <view class="top-list-item" :class="{act: current == 1}" @click="selType(1)">儿童</view>
+                    <view class="top-list-item" :class="{act: current == 2}" @click="selType(2)">中老年</view>
+                </view>
+                <view class="insurance-cont">
+                    <swiper class="swiper" circular display-multiple-items="1" @change="changeTab" :current="current">
+                    	<swiper-item class="swiper-box">
+                    		<view class="swiper-item swiper-item1">
+                                <view class="top">
+                                    <text>重疾险+意外险+医疗险</text>
+                                    <button>去定制</button>
+                                </view>
+                                <view class="list">
+                                    <view class="list-item">
+                                        <view class="img-box">
+                                            <text>医疗险</text>
+                                            <image src="../../static/code.png" mode=""></image>
+                                        </view>
+                                        <view class="detail">
+                                            <view class="tit">妈咪保贝重大疾病保险</view>
+                                            <view class="info">可保障什么鬼可保障</view>
+                                            <view class="price">234.23 <text class="txt">元/起</text></view>
+                                        </view>
+                                    </view>
+                                    <view class="list-item">
+                                        <view class="img-box">
+                                            <text>医疗险</text>
+                                            <image src="../../static/code.png" mode=""></image>
+                                        </view>
+                                        <view class="detail">
+                                            <view class="tit">妈咪保贝重大疾病保险</view>
+                                            <view class="info">可保障什么鬼可保障</view>
+                                            <view class="price">234.23 <text class="txt">元/起</text></view>
+                                        </view>
+                                    </view>
+                                    <view class="list-item">
+                                        <view class="img-box">
+                                            <text>医疗险</text>
+                                            <image src="../../static/code.png" mode=""></image>
+                                        </view>
+                                        <view class="detail">
+                                            <view class="tit">妈咪保贝重大疾病保险</view>
+                                            <view class="info">可保障什么鬼可保障</view>
+                                            <view class="price">234.23 <text class="txt">元/起</text></view>
+                                        </view>
+                                    </view>
+                                </view>
+                    		</view>
+                    	</swiper-item class="swiper-box">
+                        <swiper-item>
+                        	<view class="swiper-item swiper-item2">
+                                222222222
+                        	</view>
+                        </swiper-item class="swiper-box">
+                        <swiper-item>
+                        	<view class="swiper-item swiper-item3">
+                                33333333
+                        	</view>
+                        </swiper-item>
+                    </swiper>
+                </view>
+            </view>
+        	<view class="hot-product">
+        	    <view class="top">
+        	        <view class="top-item">热销产品你值得拥有</view>
+                    <view class="more" @click="openUrl('../product/index',2)">
+                        <text>查看全部</text>
+                    </view>
+        	    </view>
+        	    <view class="cont">
+        	        <b-product-item v-for="item in productList" :item="item" :key="item.id"></b-product-item>
+                    <view class="more" @click="openUrl('../product/index',2)">查看所有</view>
+        	    </view>
+        	</view>
+            <view class="bottom-tip">
+                <image src="../../static/home_bottom_more.png" mode=""></image>
+            </view>
+			<x-modal ref="modal" content="需要登录才能访问喔，赶紧去登录吧！" @sure="sure"></x-modal>
+			<x-modal ref="modal1" title="您还不是经纪人" content="是否立即成为保险经纪人？" @sure="sure"></x-modal>
+        </x-refresh>
+        <!-- #ifdef APP-PLUS -->
+        <x-home-tips v-if="showHomeTips" @close="showHomeTips=false"></x-home-tips>
+        <!-- #endif -->
+    </view>
+</template>
+<script>
+import { mapState } from 'vuex'
+import {updateUserinfo,requestPayment} from '@/common/api'
+// #ifdef H5
+import wx from 'jweixin-module'
+// #endif
+export default{
+    computed: mapState(['authinfo','isLogin','userinfo', 'msgStatus']),
+    data(){
+        return {
+            refreshImg: false,
+            toBgColor: 'transparent',
+            topColor: '#fff',
+            topWidth: '558',
+            // topBannerList: [],
+            // informList: [],
+            groupData: [
+                {src: '../../static/index_group1.png' , txt: '客户管理', id: 1, url: './customer'},
+                {src: '../../static/index_group2.png' , txt: '朋友圈', id: 2, url: './friends'},
+                {src: '../../static/index_group3.png' , txt: '计划书', id: 3, url: ' '},
+                {src: '../../static/index_group4.png' , txt: '今日之星', id: 4, url:'./start'},
+                {src: '../../static/index_group5.png' , txt: '打卡签到', id: 5, url: './sign'}
+            ],
+            current: 0,
+            sendData: {
+                pageNo: 1,
+                pageSize: 4,
+                isRecommend: 1
+            },
+            productList: [],
+            // startProductList: [],
+            toType: 1,
+            showHomeTips: false,
+            isWx: false
+        }
+    },
+    onShow() {
+        uni.showTabBar()
+        if(this.isLogin){
+            updateUserinfo(this)
+        }
+        let showHomeTips = 0
+        try {
+            showHomeTips = uni.getStorageSync('showHomeTips')
+            this.showHomeTips = !(parseInt(showHomeTips) > 0)
+            if(this.showHomeTips){
+				// #ifdef APP-PLUS
+					uni.hideTabBar()
+				// #endif
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    },
+    onLoad() {
+        // #ifdef MP-WEIXIN
+        this.isWx = true
+        this.topWidth = 510
+        let menuButtonInfo = uni.getMenuButtonBoundingClientRect()
+        console.log(menuButtonInfo);
+        // #endif
+        
+        try {
+            // let homeIndexBnner = uni.getStorageSync('homeTopBannerList')
+            // if (homeIndexBnner) {
+            //     this.topBannerList = homeIndexBnner
+            // } 
+            let homeProductList = uni.getStorageSync('homeProductList')
+            if (homeProductList) {
+                this.productList = homeProductList
+            }
+            // let homeInformList = uni.getStorageSync('homeInformList')
+            // if (homeInformList) {
+            //     this.informList = homeInformList
+            // }
+            // let homeStartProductList = uni.getStorageSync('homeStartProductList')
+            // if (homeStartProductList) {
+            //     this.startProductList = homeStartProductList
+            // }
+        } catch (e) {
+            // error
+        }
+        // this.getBannerList({setStorage:true,name:'homeTopBannerList'})
+        this.getProductList({setStorage:true,name:'homeProductList'})
+        // this.getInformList({setStorage:true,name:'homeInformList'})
+        // this.getStartProductList({setStorage:true,name:'homeStartProductList'})
+    },
+    methods:{
+        onPageScroll(res) {
+            if(res.scrollTop > 200){
+                this.toBgColor = 'rgba(255, 255, 255, 1)'
+                this.topColor = 'rgba(237, 237, 238, 1)'
+            } else {
+                let alpha = res.scrollTop / 200
+                this.topColor = 'rgba(255, 255, 255, 1)'
+                this.toBgColor = 'rgba(255, 255, 255, ' + alpha + ')'
+            }
+        },
+        changeTab(e){
+            this.current = e.detail.current
+        },
+        selType(val){
+            if(val == this.current) return
+            this.current = val
+        },
+		sure(){
+            if(this.toType==2){
+                if(!this.userinfo.reviewResultCode.code){
+                	this.openUrl('../join/index')
+                }else{
+                	this.openUrl('../join/audit?code='+this.userinfo.reviewResultCode.code+'&reason='+this.userinfo.reviewResultCode.reason)
+                }
+            }else{
+                this.openUrl('../my/login')
+            }
+		},
+        toMessage(){
+            if(!this.isLogin){
+				this.$refs.modal.open()
+                // #ifdef APP-PLUS
+                	uni.hideTabBar()
+                // #endif
+                return
+            }
+            this.openUrl('../message/index')
+            this.$store.commit('SET_MSG_STATUS',1)
+        },
+        toUrl(url,id){
+			console.log(id);
+            if(id == 1 || id == 5){
+                if(!this.isLogin){
+					this.$refs.modal.open()
+                    // #ifdef APP-PLUS
+                    	uni.hideTabBar()
+                    // #endif
+                    return
+                }
+            }
+            if(id == 1){
+                if(this.userinfo.reviewResultCode.code != 5){
+                	this.$refs.modal1.open()
+                	this.toType = 2
+                    return
+                }
+            }
+            this.openUrl(url)
+        },
+        // getBannerList(setStorage){
+        //     this.$api.get('ad/ad/list.do',{params:{adPos: 6},setStorage}).then( res => {
+        //         if(res.success){
+        //             this.topBannerList = res.data
+        //         }
+        //         this.bottomTips = 'nomore'
+        //     })
+        // },
+        // getInformList(setStorage){
+        //     this.$api.get('ad/ad/text/list.do',{setStorage}).then( res => {
+        //         if(res.success){
+        //             this.informList = res.data
+        //         }
+        //     })
+        // },
+        //自定义下拉刷新
+        refresh(){
+            // this.getBannerList()
+            this.getProductList()
+            // this.getInformList()
+            // this.getStartProductList()
+            setTimeout(()=>{
+            	this.$refs.xRefresh.reSet()
+            },300)
+        },
+        // 获取推荐产品
+        getProductList(setStorage){
+            this.$api.post('pdc/product/recommendList.do',{},{setStorage}).then( res => {
+                if(res.success){
+                    this.productList = res.data
+                }
+            })
+        },
+        // 获取明星产品
+        // getStartProductList(setStorage){
+        //     this.$api.post('pdc/product/getStarProduct.do',{},{setStorage}).then( res => {
+        //         if(res.success){
+        //             this.startProductList = res.data
+        //         }
+        //     })
+        // },
+        //测试支付
+        payTest(val){
+            this.openUrl('../product/list?val='+val)
+        },
+        goStarProduct () {
+            this.openUrl('./starproduct')
+        }
+    }
+}
+</script>
+<style scoped lang="scss">
+  .head{display: flex; align-items: center; justify-content: space-between; height: 100%;
+    .search-box{position: relative;
+        input{height: 72rpx; background-color: #fff; border-radius: 36rpx; padding-left: 72rpx; color: #999;}
+        .input-pld{font-size: 28rpx; color: #999;}
+        .img-search{position: absolute; left: 24rpx; top: 50%; transform: translateY(-50%);}
+    }
+    .service-icon{font-weight: bold;}
+  }
+  .content{
+    .top-bg{font-size: 0;
+        .top-bg-img{width: 100%; height: 576rpx;}
+    }
+    .group{ display: flex; padding: 66rpx 0 48rpx;
+        .item{width: 20%; text-align: center; font-size: 0;
+            image{width: 72rpx; height: 72rpx; margin-bottom: 16rpx;}
+            .txt{font-size: 24rpx; line-height: 34rpx;}
+        }
+    }
+    .insurance{background-color: #fff; margin:0 24rpx; border-radius: 12rpx; padding: 0 24rpx 24rpx;
+        .top-list{ display: flex; align-items: center; height: 98rpx; margin-bottom: 12rpx;
+            .top-list-item{margin-right: 48rpx; font-size: 36rpx; font-weight: bold; line-height: 50rpx;
+                &.act{color: $xinxii-theme-color; position: relative;
+                    &::after{content: ''; position: absolute; left: 50%; bottom: -8rpx; transform: translateX(-50%); width: 48rpx; height: 4rpx; border-radius: 3rpx; background-color: $xinxii-theme-color;}
+                }
+            }
+        }
+        .insurance-cont{
+            .swiper{height: 710rpx;
+                .swiper-item{width: 606rpx; height: 710rpx; padding: 24rpx;
+                    &.swiper-item1{background: url(../../static/home_insurance_bg1.png); background-size: 100% 100%;}
+                    &.swiper-item2{background: url(../../static/home_insurance_bg2.png); background-size: 100% 100%;}
+                    &.swiper-item3{background: url(../../static/home_insurance_bg3.png); background-size: 100% 100%;}
+                    .top{display: flex; justify-content: space-between; align-items: center;
+                        text{color: $xinxii-font-price; font-size: 32rpx; line-height: 44rpx;}
+                        button{width: 132rpx; height: 56rpx; line-height: 56rpx; border-radius: 30rpx; background: #fff; color: $xinxii-theme-color; font-size: 28rpx;}
+                    }
+                    .list{background-color: #fff; border-radius: 6rpx; margin-top: 18rpx; padding: 0 24rpx;
+                        .list-item{ display: flex; border-bottom: 1px solid $xinxii-border-color; padding: 24rpx 0;
+                            &:last-of-type{border: none;}
+                            .img-box{font-size: 0; flex-shrink: 0; margin-right: 24rpx;
+                                image{width: 150rpx; height: 150rpx;}
+                            }
+                            .detail{flex-grow: 1;
+                                .tit{font-size: 32rpx; font-weight: bold; line-height: 44rpx; @include text-line(1);}
+                                .info{margin: 8rpx 0 16rpx; color: #999; font-size: 28rpx; line-height: 36rpx;}
+                                .price{color: $xinxii-font-price; font-size: 40rpx; font-weight: bold; line-height: 1;
+                                	.txt{margin-left: 10rpx; font-size: 24rpx; font-weight: normal;}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .hot-product{background: #fff; border-radius: 12rpx; margin: 36rpx 24rpx 0; font-size: 0;
+        .top{display: flex; align-items: center; justify-content: space-between; background: url(../../static/home_product_bg.png) no-repeat; background-size: 100% 100%; height: 108rpx; padding: 0 24rpx;
+            .top-item{ color: $xinxii-theme-color; font-size: 32rpx; font-weight: bold;}
+            .more{display: flex; align-items: center; font-size: 0;
+                >text{font-size: 28rpx; color: #999;}
+            }
+        }
+        .cont{padding: 0 24rpx;
+            .more{color: $xinxii-theme-color; font-size: 28rpx; line-height: 40rpx; padding-bottom: 24rpx; text-align: center;}
+        }
+    }
+    .bottom-tip{font-size: 0; margin: 48rpx 0; text-align: center;
+        image{width: 582rpx; height: 80rpx;}
+    }
+  }
+</style>
+<style>
+    
+</style>

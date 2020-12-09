@@ -1,0 +1,116 @@
+<template>
+    <view class="content">
+        <x-nav-bar :no-border="true" title="职业资质证"></x-nav-bar>
+        <view class="mask" v-show="popUp"></view>
+        <view class="pop-up" v-show="popUp">
+            <view class="box">
+                <image lazy-load @click.stop=" popUp = false" class="close" src="./static/join/join_certificate_close.png" mode=""></image>
+                <image lazy-load class="bg" src="./static/join/join_certificate_pop.png" mode=""></image>
+                <button class="fill" @click="openUrl('./datareplenish?id='+id)">立即填写</button>
+            </view>
+        </view>
+        <view class="img-box">
+            <image lazy-load src="./static/join/join_certificate_banner.png" mode=""></image>
+        </view>
+        <view class="group">
+            <view class="tit">职业资质信息</view>
+            <x-list-item title="姓名" :msg="name" fontColor="#999" arrow="0"></x-list-item>
+            <x-list-item title="所属分公司" :msg="applySubCompany" fontColor="#999" arrow="0"></x-list-item>
+            <x-list-item title="新禧工号" :msg="jobNumber" fontColor="#FF5000" arrow="0"></x-list-item>
+            <x-list-item title="执业资质号" :msg="practiceCard" fontColor="#FF5000" arrow="0"></x-list-item>
+            <x-list-item title="执业资质证照片" msg="查看" fontColor="#999" border="0" @click="seeImg(practiceImage)"></x-list-item>
+        </view>
+		<view class="group" v-if="qualificationMessage.schoolName">
+		    <view class="tit orange">补充资料</view>
+		    <x-list-item title="毕业院校名称" :msg="qualificationMessage.schoolName" fontColor="#999" arrow="0"></x-list-item>
+		    <x-list-item title="家庭住址" :msg="qualificationMessage.province+qualificationMessage.city+qualificationMessage.area+qualificationMessage.address" fontColor="#999" arrow="0"></x-list-item>
+		    <x-list-item title="毕业证照片" msg="查看" fontColor="#999" border="0" @click="seeImg(graduationPicture)"></x-list-item>
+		</view>
+        <button class="btn" v-show="!qualificationMessage.schoolName" @click="openUrl('./datareplenish?id='+id)">补全资料</button>
+    </view>
+</template>
+
+<script>
+    // import { bigImg } from '../../common/api'
+    import { bigImg } from '@/common/api'
+    export default{
+        data () {
+            return {
+                popUp: false,
+				completeBt:false,
+				schoolMessage:true,
+				applySubCompany:'',
+				id:'',
+				jobNumber:'',
+				name:'',
+				practiceCard:'',
+				practiceImage:'',
+				schoolName:'',
+				graduationPicture:'',
+				address:'',
+				qualificationMessage:''
+            }
+        },
+		onLoad(options) {
+			if(options){
+				this.qualificationMessage = JSON.parse(options.qualificationMessage)
+				if(!this.qualificationMessage.schoolName){
+					 this.popUp = true
+				}else{
+					 this.popUp = false
+				}
+			}
+		},
+		onShow() {
+			this.getQualificationMessage()
+		},
+        methods:{
+            seeImg(url){
+                bigImg([url])
+            },
+            getQualificationMessage(){
+				this.$api.post('member/qualification/qualificationMessage.do').then( res => {
+				    if(res.success && res.data!=null){
+						this.applySubCompany = res.data.applySubCompany
+						this.id = res.data.id
+						this.jobNumber = res.data.jobNumber
+						this.name = res.data.name
+						this.practiceCard = res.data.practiceCard
+						this.practiceImage = res.data.practiceImage
+						this.schoolName = res.data.schoolName
+						this.address = res.data.province +"-"+res.data.city+"-"+res.data.area+"-"+res.data.address
+						this.graduationPicture = res.data.graduationPicture
+						if(res.data.schoolName == "" ){
+							this.popUp = true
+							this.completeBt = true
+							this.schoolMessage = false
+						}
+				    }
+				})
+			}
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+.content{padding: 0 24rpx;
+    .mask{z-index: 1000;}
+    .pop-up{position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 1001; font-size: 0;
+        .box{ position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); text-align: right;
+            .bg{width: 654rpx; height: 712rpx; border-radius: 12rpx;}
+            .close{width: 24rpx; height: 24rpx; position: absolute; top: 34rpx; right: 28rpx; z-index: 100;}
+            .fill{width: 558rpx; height: 88rpx; line-height: 88rpx; border-radius: 44rpx; font-size: 32rpx; font-weight: bold; color: #fff; background-color: $xinxii-theme-color; position: absolute; bottom: 48rpx; left: 48rpx;}
+        }
+    }
+    .img-box{font-size: 0; margin-top: 24rpx;
+        image{width: 100%; height: 312rpx;}
+    }
+    .group{border-radius: 12rpx; background: #fff; margin: 18rpx 0 48rpx;
+        .tit{font-size: 32rpx; font-weight: bold; line-height: 44rpx; padding: 24rpx 24rpx 0;
+			&.orange{color: $xinxii-theme-color;}
+		}
+    }
+    .btn{margin: 0 auto; border-radius: 8rpx; width: 702rpx; height: 88rpx; line-height: 88rpx; font-size: 32rpx; color: #fff; font-weight: bold; background-color: $xinxii-theme-color;}
+}
+    
+</style>

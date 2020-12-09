@@ -1,0 +1,118 @@
+<template>
+  <view class="binding">
+  	<x-nav-bar :no-border="true" title="注册"></x-nav-bar>
+    <view class="box">
+        <view class="group">
+          <view class="item">
+            <view class="left">
+              <image lazy-load class="phone-img" src="./static/register_phone.png" alt=""></image>
+            </view>
+            <input v-model="sendData.phone" type="text" placeholder="手机号">
+          </view>
+          <view class="item">
+            <view class="left">
+              <image lazy-load class="code-img" src="./static/register_code.png" alt=""> </image>
+            </view>
+            <input v-model="sendData.verifyCode" class="code-input" type="text" placeholder="手机验证码">
+            <view class="getCode" @click="verification">{{captcha.txt}}</view>
+            <!-- <x-input type="captcha" placeholder="手机验证码" captcha-type=" " v-model="sendData.verifyCode" :captchaMobile="sendData.mobile"></x-input> -->
+          </view>
+          <view class="btn" @click="submit">手机号注册</view>
+          <view class="tips">登录代表同意<text @click="openUrl('../ebook/userdeal')">禧小保用户协议</text><text @click="openUrl('../ebook/privacypolicy')">、隐私政策</text>，并授权使用您的新禧保险账号信息（如昵称、头像、性别）以便您统一管理。</view>
+        </view>
+      </view>
+  </view>
+</template>
+
+<script>
+import { checkPhone } from '@/common/utils/index.js'
+import { mapState, mapMutations } from 'vuex'
+export default {
+    data() {
+        return {
+            sendData:{
+                phone: '',
+                verifyCode: '',
+                disWithBranchId: ''
+            },
+            captcha: {
+            	txt: '获取验证码',
+            	cd: 60,
+            	busy: false
+            }
+        }
+    },
+    onLoad(option) {
+        if(option.disWithBranchId){
+            this.sendData.disWithBranchId = option.disWithBranchId
+        }
+    },
+    methods: {
+        submit(){
+            this.$api.post('member/login/mobileLogin.do',this.sendData).then( res => {
+                if(res.success){
+                    this.showToast('注册成功')
+                    setTimeout( ()=>{
+                        this.openUrl('./registerend')
+                    },1500)
+                }
+            })
+        },
+        verification() {
+            if (this.captcha.busy) return
+            if (!checkPhone(this.sendData.phone)) {
+                   this.showToast('请输入正确的手机号')
+                return
+            }
+            this.captcha.busy = true
+            this.captcha.txt = this.captcha.cd + 's重新获取'
+            let time = setInterval(() => {
+                this.captcha.cd--
+                this.captcha.txt = this.captcha.cd + 's重新获取'
+                if (this.captcha.cd <= 0) {
+                    clearInterval(time)
+                    this.captcha.busy = false
+                    this.captcha.txt = '获取验证码'
+                    this.captcha.cd = 60
+                }
+            }, 1000)
+            this.$api.post('verifyCode/verifyCode/encrypt/getCode.do', {
+                phone: this.sendData.phone,
+                type: 1
+            }).then( res => {
+                if (res.success) {
+                    this.showToast('发送成功')
+                } else {
+                    this.showToast('发送失败')
+                    clearInterval(time)
+                    this.captcha.busy = false
+                    this.captcha.txt = '获取验证码'
+                    this.captcha.cd = 60
+                }
+            })
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+	.binding{width: 100%; background: url('./static/register_bg.png') no-repeat; background-size: 100% 100%; font-size: 32rpx; position: absolute; min-height: 100%;}
+    .box{
+        .group{width: 702rpx;background: #fff; border-radius: 12rpx; margin: 384rpx 24rpx 0; padding: 72rpx 48rpx; display: inline-block;
+            .item{display: flex; align-items: center; height: 88rpx; margin-bottom: 48rpx; width: 606rpx;
+                .left{font-size: 0; width: 88rpx; height: 100%; background: #FF5000; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+                input{background: #F0F0F0; border: none; height: 88rpx; padding-left: 24rpx; flex: 1; outline: none;}
+                .phone-img{width: 24rpx; height: 34rpx;}
+                .code-img{width: 32rpx; height: 24rpx;}
+                .code-input{width: 298rpx;}
+                .getCode{width: 220rpx; height: 100%; flex-shrink: 0; line-height: 88rpx; text-align: center; background: #ff5000; color: #fff;}
+            }
+            .btn{border-radius: 04rpx; height: 88rpx; background: #ff5000; text-align: center; line-height: 88rpx; color: #fff;}
+            .tips{font-size: 28rpx; color: #999; line-height: 34rpx; margin-top: 24rpx;
+                >text{color: #FF5000;}
+            }
+        }
+    }
+    
+    
+</style>
